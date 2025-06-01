@@ -1,5 +1,7 @@
-import { Carousel } from 'components/carousel';
+import FeaturedPerfumes from 'components/carousel';
 import { ThreeItemGrid } from 'components/grid/three-items';
+import PerfumeBanner from 'components/hero-banner';
+
 import Footer from 'components/layout/footer';
 
 export const metadata = {
@@ -13,8 +15,9 @@ export const metadata = {
 export default function HomePage() {
   return (
     <>
+      <PerfumeBanner />
       <ThreeItemGrid />
-      <Carousel />
+      <FeaturedPerfumes />
       <Footer />
     </>
   );

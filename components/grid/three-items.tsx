@@ -1,61 +1,126 @@
-import { GridTileImage } from 'components/grid/tile';
-import { getCollectionProducts } from 'lib/shopify';
-import type { Product } from 'lib/shopify/types';
+'use client';
+import axios from 'axios';
+import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-function ThreeItemGridItem({
-  item,
-  size,
-  priority
-}: {
-  item: Product;
-  size: 'full' | 'half';
-  priority?: boolean;
-}) {
+// Define a type for our collection card
+type CollectionCardProps = {
+  _id: string;
+  name: string;
+  description?: string;
+  image?: string;
+  isFeatured: boolean;
+  displayOrder: number;
+  isStatic: boolean;
+  filters?: {
+    brands?: string[];
+    categories?: string[];
+    genders?: string[];
+    priceRange?: {
+      min: number;
+      max: number;
+    };
+  };
+};
+
+// Collection Card Component
+function CollectionCard({ _id, name, description, image, isFeatured, displayOrder, isStatic, filters }: CollectionCardProps) {
   return (
-    <div
-      className={size === 'full' ? 'md:col-span-4 md:row-span-2' : 'md:col-span-2 md:row-span-1'}
-    >
-      <Link
-        className="relative block aspect-square h-full w-full"
-        href={`/product/${item.handle}`}
-        prefetch={true}
-      >
-        <GridTileImage
-          src={item.featuredImage.url}
+    <div className="card group relative overflow-hidden rounded-lg shadow-lg h-80 transition-transform duration-500 hover:shadow-xl hover:-translate-y-1">
+      <div className="relative w-full h-full">
+        <Image
+          src={image || '/images/placeholder.png'}
+          alt={name}
           fill
-          sizes={
-            size === 'full' ? '(min-width: 768px) 66vw, 100vw' : '(min-width: 768px) 33vw, 100vw'
-          }
-          priority={priority}
-          alt={item.title}
-          label={{
-            position: size === 'full' ? 'center' : 'bottom',
-            title: item.title as string,
-            amount: item.priceRange.maxVariantPrice.amount,
-            currencyCode: item.priceRange.maxVariantPrice.currencyCode
-          }}
+          className="object-cover object-center"
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
-      </Link>
+      </div>
+      <div className="absolute inset-0 card-overlay bg-black bg-opacity-30"></div>
+      <div className="absolute inset-0 flex flex-col justify-center items-center z-10">
+        <span className="card-label bg-white bg-opacity-90 px-6 py-3 font-sans text-sm tracking-widest uppercase font-medium">
+          {name}
+        </span>
+        <Link href={`/collections/${_id}`} className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <button
+            className={`${isFeatured ? 'bg-amber-500' : 'bg-gray-500'} text-white px-5 py-2 rounded-full text-xs uppercase tracking-wider font-medium hover:bg-opacity-90`}
+          >
+            {isFeatured ? 'Featured' : 'View Collection'}
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }
 
-export async function ThreeItemGrid() {
-  // Collections that start with `hidden-*` are hidden from the search page.
-  const homepageItems = await getCollectionProducts({
-    collection: 'hidden-homepage-featured-items'
-  });
+export function ThreeItemGrid() {
+  // Collection data with styling information
 
-  if (!homepageItems[0] || !homepageItems[1] || !homepageItems[2]) return null;
+  const [collections, setCollections] = useState<CollectionCardProps[]>([]);
 
-  const [firstProduct, secondProduct, thirdProduct] = homepageItems;
+  async function fetchCollections() {
+    // use axios to fetch collections from the API
+    const response = await axios.get('/api/collections');
+    return response.data;
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await fetchCollections();
+      setCollections(data);
+    };
+    fetchData();
+  }, []);
+
+  // Fragrance types for the buttons at the bottom
+  const fragranceTypes = ['Floral', 'Woody', 'Oriental', 'Fresh', 'Citrus'];
 
   return (
-    <section className="mx-auto grid max-w-(--breakpoint-2xl) gap-4 px-4 pb-4 md:grid-cols-6 md:grid-rows-2 lg:max-h-[calc(100vh-200px)]">
-      <ThreeItemGridItem size="full" item={firstProduct} priority={true} />
-      <ThreeItemGridItem size="half" item={secondProduct} priority={true} />
-      <ThreeItemGridItem size="half" item={thirdProduct} />
-    </section>
+    <div className="container mx-auto px-4 py-16 max-w-7xl">
+      {/* Section Header */}
+      <div className="text-center mb-12">
+        <h2 className="font-serif text-4xl md:text-5xl tracking-wider mb-3">OUR PRODUCT COLLECTIONS</h2>
+        <div className="w-24 h-0.5 bg-amber-700 mx-auto"></div>
+        <p className="mt-4 text-gray-600 font-sans max-w-2xl mx-auto">
+          Discover our exquisite range of fragrances crafted with the finest ingredients to elevate your personal essence.
+        </p>
+      </div>
+
+      {/* Collection Cards - 4 column grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {collections.map((collection, index) => (
+          <CollectionCard
+            key={index}
+            _id={collection._id}
+            name={collection.name}
+            description={collection.description}
+            image={collection.image}
+            isFeatured={collection.isFeatured}
+            displayOrder={collection.displayOrder}
+            isStatic={collection.isStatic}
+            filters={collection.filters}
+          />
+        ))}
+      </div>
+
+      {/* Additional Feature - Featured Fragrances */}
+      <div className="mt-16 text-center">
+        <h3 className="font-serif text-2xl mb-6">Featured Fragrances</h3>
+        <div className="flex flex-wrap justify-center gap-4">
+          {fragranceTypes.map((type, index) => (
+            <Link
+              key={index}
+              href={`/fragrances/${type.toLowerCase()}`}
+              className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm hover:bg-gray-50 hover:border-amber-600 transition-colors cursor-pointer"
+            >
+              {type}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
+
+export default ThreeItemGrid;

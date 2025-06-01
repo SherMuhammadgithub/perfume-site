@@ -1,4 +1,6 @@
-export default {
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
   experimental: {
     ppr: true,
     inlineCss: true,
@@ -11,7 +13,14 @@ export default {
         protocol: 'https',
         hostname: 'cdn.shopify.com',
         pathname: '/s/files/**'
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**'
       }
     ]
   }
 };
+
+export default nextConfig;
