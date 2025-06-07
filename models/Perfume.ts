@@ -8,12 +8,6 @@ const PerfumeSchema = new mongoose.Schema({
         trim: true,
         index: true
     },
-    brand: {
-        type: String,
-        required: [true, 'Please provide a brand name'],
-        trim: true,
-        index: true
-    },
     description: {
         type: String,
         required: [true, 'Please provide a description']

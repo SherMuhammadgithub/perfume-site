@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import dbConnect from '../../../lib/db/mongodb';
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
         // Extract text fields
         const perfumeData = {
             name: formData.get('name') as string,
-            brand: formData.get('brand') as string,
+            // Remove brand field
             description: formData.get('description') as string,
             price: parseFloat(formData.get('price') as string || '0'),
             discountPrice: formData.get('discountPrice') ?
@@ -52,8 +52,19 @@ export async function POST(req: NextRequest) {
             isFeatured: formData.get('isFeatured') === 'true',
         };
 
-        // Validate required fields
-        const requiredFields = ['name', 'brand', 'description', 'price', 'volume', 'gender'] as const;
+        // Extract collection IDs
+        const collectionIds = formData.getAll('collections') as string[];
+        if (collectionIds.length > 0) {
+            (perfumeData as any).collections = collectionIds;
+        } else {
+            return NextResponse.json(
+                { error: 'At least one collection is required' },
+                { status: 400 }
+            );
+        }
+
+        // Validate required fields (updated to remove brand)
+        const requiredFields = ['name', 'description', 'price', 'volume', 'gender'] as const;
         type RequiredField = typeof requiredFields[number];
         for (const field of requiredFields) {
             if (!perfumeData[field as RequiredField]) {
@@ -64,53 +75,57 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // Handle image uploads
+        // Handle image uploads - FIX: Looking for image0, image1, etc. instead of 'images'
         const uploadedImages = [];
-        const imageFiles = formData.getAll('images') as File[];
 
-        if (imageFiles.length > 0) {
-            for (let i = 0; i < imageFiles.length; i++) {
-                const file = imageFiles[i];
-                if (!file || typeof file.size !== 'number' || file.size === 0) continue; // Skip empty or undefined files
+        // Look for up to 5 images with names image0, image1, etc.
+        for (let i = 0; i < 5; i++) {
+            const file = formData.get(`image${i}`) as File;
+            if (!file || typeof file.size !== 'number' || file.size === 0) continue;
 
-                // Convert File to buffer
-                const arrayBuffer = await file.arrayBuffer();
-                const buffer = Buffer.from(arrayBuffer);
+            // Convert File to buffer
+            const arrayBuffer = await file.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
 
-                // Upload to Cloudinary directly
-                const result = await new Promise<any>((resolve, reject) => {
-                    const uploadStream = cloudinary.uploader.upload_stream(
-                        {
-                            folder: `perfumes/${perfumeData.name.toLowerCase().replace(/\s+/g, '-')}`,
-                            resource_type: 'image',
-                            public_id: `perfume-${uuidv4().substring(0, 8)}`,
-                        },
-                        (error, result) => {
-                            if (error) return reject(error);
-                            resolve(result);
-                        }
-                    );
+            // Upload to Cloudinary directly
+            const result = await new Promise<any>((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: `perfumes/${perfumeData.name.toLowerCase().replace(/\s+/g, '-')}`,
+                        resource_type: 'image',
+                        public_id: `perfume-${uuidv4().substring(0, 8)}`,
+                    },
+                    (error, result) => {
+                        if (error) return reject(error);
+                        resolve(result);
+                    }
+                );
 
-                    // Stream the buffer to Cloudinary
-                    const Readable = require('stream').Readable;
-                    const readableStream = new Readable();
-                    readableStream.push(buffer);
-                    readableStream.push(null);
-                    readableStream.pipe(uploadStream);
-                });
+                // Stream the buffer to Cloudinary
+                const Readable = require('stream').Readable;
+                const readableStream = new Readable();
+                readableStream.push(buffer);
+                readableStream.push(null);
+                readableStream.pipe(uploadStream);
+            });
 
-                uploadedImages.push({
-                    url: result.secure_url,
-                    alt: perfumeData.name,
-                    isPrimary: i === 0,
-                    public_id: result.public_id
-                });
-            }
+            uploadedImages.push({
+                url: result.secure_url,
+                alt: perfumeData.name,
+                isPrimary: i === 0,
+                public_id: result.public_id
+            });
         }
 
         // Add images to perfume data
         if (uploadedImages.length > 0) {
             (perfumeData as any).images = uploadedImages;
+        } else {
+            // Return error if no images were uploaded
+            return NextResponse.json(
+                { error: 'At least one image is required' },
+                { status: 400 }
+            );
         }
 
         // Create perfume in database
@@ -137,10 +152,33 @@ export async function GET(req: NextRequest) {
         // Build query
         const query: Record<string, any> = {};
 
-        // Filter by brand
+        // Filter by collection IDs
+        const collectionIds = searchParams.getAll('collection');
+        if (collectionIds.length) {
+            query.collections = { $in: collectionIds };
+        }
+
+        // Filter by brand through collection
         const brands = searchParams.getAll('brand');
         if (brands.length) {
-            query.brand = { $in: brands };
+            // Instead of directly filtering by brand, 
+            // we'll find collections with these brands first
+            const collectionsWithBrands = await mongoose.model('Collection').find({
+                'filters.brands': { $in: brands }
+            }).select('_id');
+
+            const collectionIds = collectionsWithBrands.map(c => c._id);
+
+            // If we already have collections filter, use $and to combine them
+            if (query.collections) {
+                query.$and = [
+                    { collections: query.collections },
+                    { collections: { $in: collectionIds } }
+                ];
+                delete query.collections;
+            } else {
+                query.collections = { $in: collectionIds };
+            }
         }
 
         // Filter by gender
@@ -206,9 +244,13 @@ export async function GET(req: NextRequest) {
                 sort = { createdAt: -1 }; // Default sort by newest
         }
 
-        // Execute query with pagination
+        // Execute query with pagination and populate collections
         const perfumes = await (Perfume as Model<any>)
             .find(query)
+            .populate({
+                path: 'collections',
+                select: 'name description image filters'
+            })
             .sort(sort)
             .skip(skip)
             .limit(limit);

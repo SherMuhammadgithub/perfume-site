@@ -9,13 +9,39 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { Perfume } from "lib/interfaces/data.type";
 import { ChevronLeft, ChevronRight, ShoppingBag, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export function FeaturedPerfumes() {
+// Using the same Perfume interface
+interface Perfume {
+  _id: string;
+  name: string;
+  brand: string;
+  price: number;
+  discountPrice?: number;
+  images: Array<{
+    url: string;
+    alt: string;
+    isPrimary: boolean;
+  }>;
+  isBestseller: boolean;
+  collections?: Array<{
+    filters?: {
+      brands?: string[];
+      categories?: string[];
+      genders?: string[];
+      priceRange?: {
+        min: number;
+        max: number;
+      };
+    };
+    name?: string;
+  }>;
+}
+
+export function BestsellerPerfumes() {
   const [perfumes, setPerfumes] = useState<Perfume[]>([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
@@ -25,7 +51,7 @@ export function FeaturedPerfumes() {
 
   // Embla carousel setup
   const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: false,
+    loop: false, // Changed from true to false
     align: "start",
     slidesToScroll: 1,
     breakpoints: {
@@ -72,18 +98,18 @@ export function FeaturedPerfumes() {
   const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
   useEffect(() => {
-    const fetchFeaturedPerfumes = async () => {
+    const fetchBestsellerPerfumes = async () => {
       try {
-        const response = await axios.get("/api/perfumes/featured");
+        const response = await axios.get("/api/perfumes/bestsellers");
         setPerfumes(response.data || []);
       } catch (error) {
-        console.error("Error fetching featured perfumes:", error);
+        console.error("Error fetching bestseller perfumes:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchFeaturedPerfumes();
+    fetchBestsellerPerfumes();
   }, []);
 
   if (!loading && !perfumes.length) return null;
@@ -140,15 +166,15 @@ export function FeaturedPerfumes() {
   // Decorative background elements
   const backgroundElements = (
     <>
-      <div className="absolute top-0 left-0 w-full overflow-hidden -z-10 opacity-30 dark:opacity-10">
+      <div className="absolute top-0 right-0 w-full overflow-hidden -z-10 opacity-30 dark:opacity-10">
         <motion.div
-          className="w-[600px] h-[600px] rounded-full bg-gradient-to-br from-amber-200 to-amber-50 blur-3xl -translate-x-1/2 -translate-y-1/2"
+          className="w-[600px] h-[600px] rounded-full bg-gradient-to-bl from-amber-100 to-amber-50 blur-3xl translate-x-1/2 -translate-y-1/2"
           style={{ y: backgroundY }}
         />
       </div>
-      <div className="absolute top-0 right-0 w-full overflow-hidden -z-10 opacity-30 dark:opacity-10">
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden -z-10 opacity-30 dark:opacity-10">
         <motion.div
-          className="w-[500px] h-[500px] rounded-full bg-gradient-to-bl from-rose-100 to-amber-100 blur-3xl translate-x-1/2 -translate-y-1/4"
+          className="w-[500px] h-[500px] rounded-full bg-gradient-to-br from-rose-100 to-amber-100 blur-3xl -translate-x-1/4 translate-y-1/4"
           style={{ y: backgroundY }}
         />
       </div>
@@ -158,7 +184,7 @@ export function FeaturedPerfumes() {
   return (
     <section
       ref={sectionRef}
-      className="py-8 relative bg-gradient-to-b from-neutral-50 to-white dark:from-neutral-900 dark:to-neutral-800 overflow-hidden"
+      className="py-8 relative bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 overflow-hidden"
     >
       {backgroundElements}
 
@@ -180,7 +206,7 @@ export function FeaturedPerfumes() {
           >
             <span className="absolute -inset-1 rounded-full blur opacity-30 bg-amber-200 dark:bg-amber-700"></span>
             <h2 className="relative text-4xl md:text-5xl tracking-wider mb-3 font-playfair font-medium">
-              Featured Perfumes
+              Bestsellers
             </h2>
           </motion.div>
 
@@ -199,8 +225,8 @@ export function FeaturedPerfumes() {
             transition={{ duration: 0.8, delay: 0.4 }}
             viewport={{ once: true }}
           >
-            Discover our curated collection of featured perfumes—unique,
-            popular, and exclusive scents for every style and occasion.
+            Discover our most coveted fragrances—timeless essentials and
+            customer favorites that define luxury and excellence.
           </motion.p>
         </motion.div>
 
@@ -293,7 +319,7 @@ export function FeaturedPerfumes() {
                         custom={index}
                       >
                         <motion.div
-                          className="h-64 sm:h-80 md:h-[340px] overflow-hidden rounded-2xl shadow-md group-hover:shadow-xl transition-all duration-300 relative"
+                          className="h-64 sm:h-72 md:h-[340px] overflow-hidden rounded-2xl shadow-md group-hover:shadow-xl transition-all duration-300 relative"
                           whileHover={{ scale: 1.02 }}
                           transition={{ type: "spring", stiffness: 300 }}
                           style={{
@@ -304,7 +330,6 @@ export function FeaturedPerfumes() {
                         >
                           <Link
                             href={`/product/${perfume._id}`}
-                            prefetch={true}
                             className="block h-full w-full"
                           >
                             <div className="relative h-full w-full bg-gray-100">
@@ -337,7 +362,7 @@ export function FeaturedPerfumes() {
                                   <motion.span
                                     key={idx}
                                     className="bg-black/70 backdrop-blur-md text-white text-xs uppercase 
-                                          tracking-wider px-3 py-1 rounded-full font-medium"
+                                              tracking-wider px-3 py-1 rounded-full font-medium"
                                     initial={{ x: -20, opacity: 0 }}
                                     animate={{ x: 0, opacity: 1 }}
                                     transition={{ delay: 0.2 + idx * 0.1 }}
@@ -351,11 +376,42 @@ export function FeaturedPerfumes() {
                                 ))}
                               </div>
 
+                              {/* Bestseller badge with animation */}
+                              <motion.div
+                                className="absolute top-2 right-1 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold px-3 py-1 
+                                          rounded-full flex items-center justify-center shadow-lg"
+                                initial={{ scale: 0, rotate: 15 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                transition={{
+                                  delay: 0.2 + index * 0.1,
+                                  type: "spring",
+                                  stiffness: 400,
+                                }}
+                                whileHover={{
+                                  scale: 1.05,
+                                  transition: { duration: 0.2 },
+                                }}
+                              >
+                                <motion.span
+                                  animate={{
+                                    scale: [1, 1.08, 1],
+                                  }}
+                                  transition={{
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    repeatDelay: 3,
+                                  }}
+                                  className="text-xs uppercase tracking-wider font-medium"
+                                >
+                                  Bestseller
+                                </motion.span>
+                              </motion.div>
+
                               {/* Enhanced sale badge with animation */}
                               {perfume.discountPrice && (
                                 <motion.div
                                   className="absolute bottom-3 left-3 bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold px-3 py-1 
-                                        rounded-full flex items-center justify-center shadow-lg"
+                                            rounded-full flex items-center justify-center shadow-lg"
                                   initial={{ scale: 0, rotate: -15 }}
                                   animate={{ scale: 1, rotate: -12 }}
                                   transition={{
@@ -389,7 +445,7 @@ export function FeaturedPerfumes() {
                                 </motion.div>
                               )}
 
-                              {/* Action buttons container - Removed wishlist button */}
+                              {/* Action buttons container */}
                               <div className="absolute right-3 bottom-3">
                                 {/* Add to cart button with success animation */}
                                 <motion.button
@@ -425,14 +481,11 @@ export function FeaturedPerfumes() {
                         >
                           <motion.h3
                             className="font-playfair font-medium text-sm sm:text-base lg:text-lg text-gray-900 
-                                dark:text-gray-100 line-clamp-1"
+                                    dark:text-gray-100 line-clamp-1"
                             whileHover={{ x: 3 }}
                             transition={{ type: "spring", stiffness: 300 }}
                           >
-                            <Link
-                              href={`/product/${perfume._id}`}
-                              prefetch={true}
-                            >
+                            <Link href={`/product/${perfume._id}`}>
                               {perfume.name}
                             </Link>
                           </motion.h3>
@@ -444,8 +497,9 @@ export function FeaturedPerfumes() {
                             animate={{ opacity: 0.8 }}
                             transition={{ delay: 0.35 + index * 0.1 }}
                           >
-                            {perfume.category || "Eau de Parfum"} ·{" "}
-                            {perfume.volume || "50ml"}
+                            {perfume.collections?.[0]?.name ||
+                              "Signature Collection"}{" "}
+                            · Most Popular
                           </motion.p>
 
                           <div className="flex items-center justify-between mt-3">
@@ -463,7 +517,7 @@ export function FeaturedPerfumes() {
                                       transition: { duration: 0.2 },
                                     }}
                                   >
-                                    PKR{perfume.discountPrice.toFixed(2)}
+                                    PKR {perfume.discountPrice.toFixed(2)}
                                   </motion.span>
                                   <motion.span
                                     className="text-gray-500 text-xs sm:text-sm line-through"
@@ -471,7 +525,7 @@ export function FeaturedPerfumes() {
                                     animate={{ opacity: 0.7 }}
                                     transition={{ delay: 0.45 + index * 0.1 }}
                                   >
-                                    PKR{perfume.price.toFixed(2)}
+                                    PKR {perfume.price.toFixed(2)}
                                   </motion.span>
                                 </>
                               ) : (
@@ -482,7 +536,7 @@ export function FeaturedPerfumes() {
                                   transition={{ delay: 0.4 + index * 0.1 }}
                                   whileHover={{ scale: 1.05 }}
                                 >
-                                  PKR{perfume.price.toFixed(2)}
+                                  PKR {perfume.price.toFixed(2)}
                                 </motion.span>
                               )}
                             </div>
@@ -494,9 +548,8 @@ export function FeaturedPerfumes() {
                             >
                               <Link
                                 href={`/product/${perfume._id}`}
-                                prefetch={true}
                                 className="text-xs sm:text-sm text-amber-600 hover:text-amber-700 dark:text-amber-500 dark:hover:text-amber-400 transition-colors 
-                                    border-b border-transparent hover:border-amber-600 dark:hover:border-amber-500"
+                                        border-b border-transparent hover:border-amber-600 dark:hover:border-amber-500"
                               >
                                 View Details
                               </Link>
@@ -562,12 +615,11 @@ export function FeaturedPerfumes() {
             />
             <Link
               href="/search"
-              prefetch={true}
               className="relative inline-flex items-center gap-2 px-8 py-3 bg-black dark:bg-white dark:text-black text-white 
                         font-medium text-sm sm:text-base rounded-full transition-all duration-300 
                         shadow-sm hover:shadow-md"
             >
-              <span>Explore All Perfumes</span>
+              <span>Explore All Collections</span>
               <motion.span
                 animate={{
                   x: [0, 4, 0],
@@ -600,4 +652,4 @@ export function FeaturedPerfumes() {
   );
 }
 
-export default FeaturedPerfumes;
+export default BestsellerPerfumes;

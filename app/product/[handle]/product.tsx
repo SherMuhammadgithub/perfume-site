@@ -1,202 +1,357 @@
-'use client';
+"use client";
 
-import { useCart } from 'app/context/cartContext';
-import { Suspense, useState } from 'react';
+import { useCart } from "app/context/cartContext";
+import { motion } from "framer-motion";
+import { Info, RotateCcw, ShoppingBag, Star, Truck } from "lucide-react";
+import { Suspense, useEffect, useState } from "react";
 
 // Interface for PerfumeImage to match MongoDB schema
 interface PerfumeImage {
-    url: string;
-    alt: string;
-    isPrimary: boolean;
+  url: string;
+  alt: string;
 }
 
 // Interface for Perfume to match MongoDB schema
 interface Perfume {
-    _id: string;
-    name: string;
-    brand: string;
-    description: string;
-    price: number;
-    discountPrice?: number;
-    volume: string;
-    stock: number;
-    gender: 'Male' | 'Female' | 'Unisex';
-    images: PerfumeImage[];
-    isNew: boolean;
-    isBestseller: boolean;
-    isFeatured: boolean;
-    averageRating: number;
-    totalReviews: number;
-    collections?: string[];
+  _id: string;
+  name: string;
+  brand: string;
+  description: string;
+  price: number;
+  discountPrice?: number;
+  volume: string;
+  stock: number;
+  gender: "Male" | "Female" | "Unisex";
+  images: PerfumeImage[];
+  isNew: boolean;
+  isBestseller: boolean;
+  isFeatured: boolean;
+  averageRating: number;
+  totalReviews: number;
+  collections?: string[];
 }
 
 // Client component that uses the useCart hook
 export default function ProductClient({ product }: { product: Perfume }) {
-    return (
-        <Suspense fallback={<div className="w-full h-64 animate-pulse bg-gray-50" />}>
-            <ProductDescription product={product} />
-        </Suspense>
-    );
+  return (
+    <Suspense
+      fallback={<div className="w-full h-64 animate-pulse bg-gray-50" />}
+    >
+      <ProductDescription product={product} />
+    </Suspense>
+  );
 }
 
 function ProductDescription({ product }: { product: Perfume }) {
-    // Volume options - you might want to fetch these from an API or config
-    const volumeOptions = ['30ml', '50ml', '100ml'];
+  // Volume options - you might want to fetch these from an API or config
+  const volumeOptions = ["30ml", "50ml", "100ml"];
 
-    // Selected volume state (initialize with product's volume)
-    const [selectedVolume, setSelectedVolume] = useState(product.volume);
+  // Selected volume state (initialize with product's volume)
+  const [selectedVolume, setSelectedVolume] = useState(product.volume);
+  const [quantity, setQuantity] = useState(1);
+  const [isWishListed, setIsWishListed] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
 
-    // Cart functionality
-    const { addToCart } = useCart();
+  // Cart functionality
+  const { addToCart } = useCart();
 
-    // Calculate discount percentage if discounted
-    const discountPercentage = product.discountPrice
-        ? Math.round((1 - (product.discountPrice / product.price)) * 100)
-        : 0;
+  // Calculate discount percentage if discounted
+  const discountPercentage = product.discountPrice
+    ? Math.round((1 - product.discountPrice / product.price) * 100)
+    : 0;
 
-    return (
-        <div className="flex flex-col gap-6">
-            {/* Product Title and Brand */}
-            <div>
-                <p className="text-sm uppercase tracking-wider text-gray-500 mb-1 font-medium">{product.brand}</p>
-                <h1 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900">{product.name}</h1>
+  // Reset added-to-cart animation after 2 seconds
+  useEffect(() => {
+    if (addedToCart) {
+      const timer = setTimeout(() => setAddedToCart(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [addedToCart]);
 
-                {/* Price with potential discount */}
-                <div className="mt-3 flex items-center gap-2">
-                    {product.discountPrice ? (
-                        <>
-                            <p className="text-xl font-medium text-red-600">${product.discountPrice.toFixed(2)}</p>
-                            <p className="text-sm text-gray-500 line-through">${product.price.toFixed(2)}</p>
-                            <span className="px-1.5 py-0.5 bg-red-100 text-red-800 text-xs font-medium rounded">
-                                {discountPercentage}% OFF
-                            </span>
-                        </>
-                    ) : (
-                        <p className="text-xl font-medium text-gray-900">${product.price.toFixed(2)}</p>
-                    )}
-                </div>
-            </div>
+  // Handle add to cart with animation
+  const handleAddToCart = () => {
+    if (product.stock > 0) {
+      // Add to cart functionality
+      for (let i = 0; i < quantity; i++) {
+        addToCart(product);
+      }
+      setAddedToCart(true);
+    }
+  };
 
-            {/* Rating and Stock Status */}
-            <div className="flex items-center justify-between">
-                {/* Rating display */}
-                {product.totalReviews > 0 && (
-                    <div className="flex items-center">
-                        <div className="flex">
-                            {[...Array(5)].map((_, i) => (
-                                <svg
-                                    key={i}
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className={`h-4 w-4 ${i < Math.floor(product.averageRating) ? 'text-yellow-400' : 'text-gray-200'}`}
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                >
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                            ))}
-                        </div>
-                        <span className="ml-1 text-sm text-gray-600">{product.averageRating.toFixed(1)}</span>
-                        <span className="ml-1 text-sm text-gray-500">({product.totalReviews} reviews)</span>
-                    </div>
-                )}
+  // Handle quantity changes
+  const incrementQuantity = () => {
+    if (quantity < Math.min(10, product.stock)) {
+      setQuantity(quantity + 1);
+    }
+  };
 
-                {/* Stock status */}
-                <div className="text-sm">
-                    {product.stock > 10 ? (
-                        <span className="text-green-600 font-medium">In Stock</span>
-                    ) : product.stock > 0 ? (
-                        <span className="text-amber-600 font-medium">Low Stock ({product.stock} left)</span>
-                    ) : (
-                        <span className="text-red-600 font-medium">Out of Stock</span>
-                    )}
-                </div>
-            </div>
+  const decrementQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
 
-            {/* Product Tags */}
-            <div className="flex flex-wrap gap-2">
-                {/* Gender tag */}
-                <span className="px-2.5 py-1 bg-gray-100 text-gray-800 text-xs font-medium uppercase tracking-wider">
-                    {product.gender}
-                </span>
-
-                {/* Status tags */}
-                <div className="flex gap-2">
-                    {product.isBestseller && (
-                        <span className="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-medium uppercase tracking-wider">
-                            Bestseller
-                        </span>
-                    )}
-                    {product.isNew && (
-                        <span className="px-2.5 py-1 bg-green-100 text-green-800 text-xs font-medium uppercase tracking-wider">
-                            New
-                        </span>
-                    )}
-                    {product.isFeatured && (
-                        <span className="px-2.5 py-1 bg-blue-100 text-blue-800 text-xs font-medium uppercase tracking-wider">
-                            Featured
-                        </span>
-                    )}
-                </div>
-            </div>
-
-            {/* Volume Options */}
-            <div>
-                <label className="block text-sm font-medium text-gray-700 uppercase tracking-wider mb-2">Volume</label>
-                <div className="flex flex-wrap gap-2">
-                    {volumeOptions.map((vol) => (
-                        <button
-                            key={vol}
-                            onClick={() => setSelectedVolume(vol)}
-                            className={`border ${vol === selectedVolume ? 'border-black bg-gray-100' : 'border-gray-300'} 
-                            px-4 py-2 hover:border-black transition-colors text-sm`}
-                        >
-                            {vol}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Add to Cart */}
-            <div className="mt-2">
-                <button
-                    className={`w-full py-3.5 font-medium tracking-wide ${product.stock > 0
-                        ? 'bg-black text-white hover:bg-gray-800'
-                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                        } transition-colors`}
-                    onClick={() => product.stock > 0 && addToCart(product)}
-                    disabled={product.stock === 0}
-                >
-                    {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
-                </button>
-            </div>
-
-            {/* Description */}
-            <div className="prose prose-sm max-w-none mt-4 border-t border-gray-100 pt-6">
-                <h3 className="font-medium text-gray-900 uppercase tracking-wider text-sm mb-3">Description</h3>
-                <div className="text-sm text-gray-600 leading-relaxed">
-                    {product.description}
-                </div>
-            </div>
-
-            {/* Collections (if available) */}
-            {product.collections && product.collections.length > 0 && (
-                <div className="mt-4">
-                    <h3 className="text-sm font-medium text-gray-900 uppercase tracking-wider mb-2">Collections</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {product.collections.map((collection) => (
-                            <span key={collection} className="px-2.5 py-1 bg-gray-50 border border-gray-200 text-gray-800 text-xs">
-                                {collection}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Additional Information */}
-            <div className="text-xs text-gray-500 mt-2">
-                <p>Free shipping on orders over $50</p>
-                <p className="mt-1">30-day returns</p>
-            </div>
+  return (
+    <div className="flex flex-col gap-8">
+      {/* Product Title and Brand - Enhanced with better spacing */}
+      <div className="border-b border-gray-100 pb-6">
+        <div className="flex items-center">
+          {product.isNew && (
+            <span className="ml-2 inline-block bg-green-100 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider text-green-800 rounded-md">
+              New
+            </span>
+          )}
         </div>
-    );
+
+        <h1 className="mt-2 text-2xl sm:text-3xl  font-bold text-gray-900 tracking-tight">
+          {product.name}
+        </h1>
+
+        {/* Enhanced Price with animation on discount tag */}
+        <div className="mt-4 flex items-center gap-3">
+          {product.discountPrice ? (
+            <>
+              <p className="text-2xl sm:text-3xl font-medium text-gray-900 leading-none">
+                ${product.discountPrice.toFixed(2)}
+              </p>
+              <p className="text-sm sm:text-base text-gray-500 line-through">
+                ${product.price.toFixed(2)}
+              </p>
+              <motion.div
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 10,
+                }}
+                className="bg-red-600 text-white px-2 py-1 rounded-md text-xs sm:text-sm font-bold"
+              >
+                SAVE {discountPercentage}%
+              </motion.div>
+            </>
+          ) : (
+            <p className="text-2xl sm:text-3xl font-medium text-gray-900">
+              ${product.price.toFixed(2)}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Enhanced Rating with star animations and Stock Status */}
+      <div className="flex items-center justify-between">
+        {/* Animated Rating display */}
+        {product.totalReviews > 0 ? (
+          <motion.div
+            className="flex items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="flex">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <motion.div
+                  key={star}
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: star * 0.1 }}
+                >
+                  <Star
+                    size={18}
+                    className={`${
+                      star <= Math.round(product.averageRating)
+                        ? "fill-amber-400 text-amber-400"
+                        : "text-gray-200"
+                    } mr-0.5`}
+                  />
+                </motion.div>
+              ))}
+            </div>
+            <span className="ml-2 text-sm font-medium text-gray-700">
+              {product.averageRating.toFixed(1)}
+            </span>
+            <a
+              href="#reviews"
+              className="ml-1 text-sm text-amber-600 hover:text-amber-800 hover:underline"
+            >
+              ({product.totalReviews}{" "}
+              {product.totalReviews === 1 ? "review" : "reviews"})
+            </a>
+          </motion.div>
+        ) : (
+          <span className="text-sm text-gray-500">No reviews yet</span>
+        )}
+
+        {/* Enhanced Stock status with icon */}
+        <div className="text-sm flex items-center">
+          {product.stock > 10 ? (
+            <span className="flex items-center gap-1 text-green-600 font-medium">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              In Stock
+            </span>
+          ) : product.stock > 0 ? (
+            <span className="flex items-center gap-1 text-amber-600 font-medium">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+              </span>
+              Only {product.stock} left
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 text-red-600 font-medium">
+              <span className="relative flex h-2 w-2">
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+              </span>
+              Out of Stock
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Product Tags in pills - Enhanced design */}
+      <div className="flex flex-wrap gap-2">
+        {/* Gender tag */}
+        <div className="px-3 py-1.5 bg-gray-100 text-gray-800 text-xs font-medium rounded-full flex items-center">
+          {product.gender === "Male" && "Men's Fragrance"}
+          {product.gender === "Female" && "Women's Fragrance"}
+          {product.gender === "Unisex" && "Unisex Fragrance"}
+        </div>
+
+        {/* Status tags with better styling */}
+        {product.isBestseller && (
+          <div className="px-3 py-1.5 bg-amber-100 text-amber-800 text-xs font-medium rounded-full flex items-center">
+            <Star size={12} className="mr-1" />
+            Bestseller
+          </div>
+        )}
+        {product.isFeatured && (
+          <div className="px-3 py-1.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full flex items-center">
+            Featured
+          </div>
+        )}
+      </div>
+
+      {/* Enhanced Volume Options with better styling */}
+      <div className="bg-gray-50 p-4 rounded-lg">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-gray-700 uppercase tracking-wider">
+            Volume
+          </label>
+          <div className="px-4 py-2 bg-white border border-gray-200 rounded-md shadow-sm">
+            <span className="text-sm font-medium text-gray-800">
+              {product.volume}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Quantity control and Add to Cart - Enhanced with better design */}
+      {product.stock > 0 && (
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+            <label className="text-sm font-medium text-gray-700 uppercase tracking-wider">
+              Quantity
+            </label>
+
+            <div className="flex items-center h-12 rounded-md border border-gray-300 w-36">
+              <button
+                onClick={decrementQuantity}
+                className="flex-1 flex justify-center items-center h-full text-gray-600 hover:text-gray-800 transition-colors"
+                disabled={quantity <= 1}
+              >
+                <span className="text-xl font-medium">−</span>
+              </button>
+
+              <span className="flex-1 flex justify-center items-center h-full text-gray-800 font-medium border-l border-r border-gray-300">
+                {quantity}
+              </span>
+
+              <button
+                onClick={incrementQuantity}
+                className="flex-1 flex justify-center items-center h-full text-gray-600 hover:text-gray-800 transition-colors"
+                disabled={quantity >= Math.min(10, product.stock)}
+              >
+                <span className="text-xl font-medium">+</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              className={`flex-1 py-3.5 px-6 rounded-md font-medium text-white flex items-center justify-center gap-2 
+                ${
+                  addedToCart
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-black hover:bg-gray-800"
+                } 
+                transition-all duration-300`}
+              onClick={handleAddToCart}
+              disabled={product.stock === 0}
+            >
+              {addedToCart ? (
+                <>
+                  Added <span className="ml-1">✓</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingBag size={18} />
+                  Add to Cart
+                </>
+              )}
+            </motion.button>
+          </div>
+        </div>
+      )}
+
+      {/* Out of Stock Button */}
+      {product.stock === 0 && (
+        <button
+          className="w-full py-3.5 font-medium text-gray-500 bg-gray-200 rounded-md cursor-not-allowed flex items-center justify-center gap-2"
+          disabled
+        >
+          <Info size={18} />
+          Out of Stock
+        </button>
+      )}
+
+      {/* Enhanced Shipping and Return Info with icons */}
+      <div className="flex flex-col gap-3 py-4 border-t border-b border-gray-100">
+        <div className="flex gap-2 items-center">
+          <Truck size={18} className="text-gray-400" />
+          <p className="text-sm text-gray-700">
+            <span className="font-medium">Free shipping</span> on orders over
+            $50
+          </p>
+        </div>
+        <div className="flex gap-2 items-center">
+          <RotateCcw size={18} className="text-gray-400" />
+          <p className="text-sm text-gray-700">
+            <span className="font-medium">30-day returns</span> for unopened
+            items
+          </p>
+        </div>
+      </div>
+
+      {/* Enhanced Description with better typography and section styling */}
+      <div className="prose prose-sm max-w-none">
+        <h3 className="font-medium text-gray-900 uppercase tracking-wider text-sm mb-3 flex items-center">
+          <span className="w-6 h-0.5 bg-amber-500 mr-2"></span>
+          Description
+        </h3>
+
+        <div className="text-sm text-gray-700 leading-relaxed bg-gray-50 p-5 rounded-lg border border-gray-100">
+          {product.description.split("\n").map((paragraph, idx) => (
+            <p key={idx} className="mb-3 last:mb-0">
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
