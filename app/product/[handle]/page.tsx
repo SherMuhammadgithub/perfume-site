@@ -51,8 +51,10 @@ async function getProduct(handle: string) {
 
 export default async function ProductPage({
   params,
+  searchParams, // Add this parameter
 }: {
   params: { handle: string };
+  searchParams?: { [key: string]: string | string[] | undefined }; // Add this type
 }) {
   // Fetch the product using the handle parameter
   const { handle } = params;
