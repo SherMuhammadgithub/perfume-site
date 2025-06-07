@@ -58,13 +58,13 @@ export async function GET(
 // PUT /api/perfumes/[id] - Update a perfume
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
 
     // Access id directly
-    const id = params.id;
+    const id = (await params).id;
 
     if (!isValidObjectId(id)) {
       return NextResponse.json(
@@ -98,13 +98,13 @@ export async function PUT(
 // DELETE /api/perfumes/[id] - Delete a perfume
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
 
     // Access id directly
-    const id = params.id;
+    const id = (await params).id;
 
     if (!isValidObjectId(id)) {
       return NextResponse.json(
