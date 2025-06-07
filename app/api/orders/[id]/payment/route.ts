@@ -8,21 +8,27 @@ function isValidObjectId(id: string) {
   return mongoose.Types.ObjectId.isValid(id);
 }
 
+interface PaymentRouteParams {
+  params: {
+    id: string;
+  };
+}
+
 // PUT /api/orders/[id]/payment - Update payment status
 export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } } // Use the expected type directly
+  request: NextRequest,
+  { params }: PaymentRouteParams
 ) {
   try {
     await dbConnect();
 
-    const { id } = params; // Access directly from params
+    const { id } = params; // Access via context.params
 
     if (!isValidObjectId(id)) {
       return NextResponse.json({ error: "Invalid order ID" }, { status: 400 });
     }
 
-    const { paymentStatus, paymentDetails } = await req.json();
+    const { paymentStatus, paymentDetails } = await request.json();
 
     if (!paymentStatus) {
       return NextResponse.json(
