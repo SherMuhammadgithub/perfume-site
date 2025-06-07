@@ -11,12 +11,12 @@ function isValidObjectId(id: string) {
 // PUT /api/orders/[id]/payment - Update payment status
 export async function PUT(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
 
-    const { id } = context.params; // Access via context.params
+    const { id } = await context.params;
 
     if (!isValidObjectId(id)) {
       return NextResponse.json({ error: "Invalid order ID" }, { status: 400 });
