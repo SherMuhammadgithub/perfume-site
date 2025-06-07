@@ -8,15 +8,15 @@ function isValidObjectId(id: string) {
   return mongoose.Types.ObjectId.isValid(id);
 }
 
-// Define consistent route params type
-type RouteParams = { params: { id: string } };
-
 // PUT /api/orders/[id]/status - Update order status
-export async function PUT(req: NextRequest, context: RouteParams) {
+export async function PUT(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     await dbConnect();
 
-    const { id } = context.params;
+    const { id } = await context.params;
 
     if (!isValidObjectId(id)) {
       return NextResponse.json({ error: "Invalid order ID" }, { status: 400 });
