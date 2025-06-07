@@ -1,8 +1,15 @@
-import { headers } from "next/headers";
+import axios from "axios";
+import Footer from "components/layout/footer";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductClient from "./product";
 import { ProductImageGallery } from "./product-image-gallery";
+
+// Dynamically import the client component
+// const DynamicProductImageGallery = dynamic(() =>
+//   import('./product-image-gallery').then(mod => mod.ProductImageGallery),
+//   { ssr: false, loading: () => <ProductImageSkeleton /> }
+// );
 
 // Updated Perfume interface to match MongoDB schema
 interface PerfumeImage {
@@ -29,48 +36,26 @@ interface Perfume {
   collections?: string[];
 }
 
-// Server component fetch with proper URL handling
+// Function to fetch a product by handle on the server side
 async function getProduct(handle: string) {
   try {
-    // Get host from headers for reliable URL resolution in production
-    const headersList = await headers();
-    const host = headersList.get("host");
-    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-
-    // Build the full URL but still use relative format for the actual fetch
-    console.log(
-      `Fetching product from: ${protocol}://${host}/api/perfumes/${handle}`
-    );
-
-    const response = await fetch(
-      `${protocol}://${host}/api/perfumes/${handle}`,
-      {
-        cache: "no-store",
-        // This is the key change - Next.js needs to know this is a "self" request
-        next: {
-          tags: ["product", handle],
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch product: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.perfume;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const response = await axios.get(`${baseUrl}/api/perfumes/${handle}`);
+    console.log("Fetched product:", response.data);
+    return response.data.perfume;
   } catch (error) {
     console.error("Failed to fetch product:", error);
     return null;
   }
 }
 
-interface PageProps {
+export default async function ProductPage({
+  params,
+  searchParams, // Add this parameter
+}: {
   params: Promise<{ handle: string }>;
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-}
-
-export default async function ProductPage({ params, searchParams }: PageProps) {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>; // Add this type
+}) {
   // Fetch the product using the handle parameter
   const { handle } = await params;
   const product = await getProduct(handle);
@@ -126,27 +111,30 @@ export default async function ProductPage({ params, searchParams }: PageProps) {
         }}
       />
 
-      {/* Breadcrumbs */}
-      <div className="mb-4 text-sm">
-        <Link href="/" className="text-gray-500 hover:text-gray-700">
-          Home
-        </Link>
-        <span className="mx-2 text-gray-400">/</span>
-        <span className="text-gray-900">{product.name}</span>
-      </div>
-
-      {/* Product Details Section */}
-      <div className="flex flex-col rounded-lg border border-neutral-200 p-4 sm:p-8 md:p-12 lg:flex-row lg:gap-8 bg-white shadow-sm">
-        {/* Product Images */}
-        <div className="h-full w-full basis-full lg:basis-3/5 mb-4">
-          <ProductImageGallery images={product.images} name={product.name} />
+      <div className="mx-auto max-w-7xl px-4 py-4 md:py-10">
+        {/* Breadcrumbs */}
+        <div className="mb-4 text-sm">
+          <Link href="/" className="text-gray-500 hover:text-gray-700">
+            Home
+          </Link>
+          <span className="mx-2 text-gray-400">/</span>
+          <span className="text-gray-900">{product.name}</span>
         </div>
 
-        {/* Product Details */}
-        <div className="basis-full lg:basis-2/5">
-          <ProductClient product={product} />
+        {/* Product Details Section */}
+        <div className="flex flex-col rounded-lg border border-neutral-200 p-4 sm:p-8 md:p-12 lg:flex-row lg:gap-8 bg-white shadow-sm">
+          {/* Product Images */}
+          <div className="h-full w-full basis-full lg:basis-3/5 mb-4">
+            <ProductImageGallery images={product.images} name={product.name} />
+          </div>
+
+          {/* Product Details */}
+          <div className="basis-full lg:basis-2/5">
+            <ProductClient product={product} />
+          </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

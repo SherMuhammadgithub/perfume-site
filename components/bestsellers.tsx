@@ -12,6 +12,7 @@ import {
 import { ChevronLeft, ChevronRight, ShoppingBag, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 // Using the same Perfume interface
@@ -48,7 +49,7 @@ export function BestsellerPerfumes() {
   const [addedToCart, setAddedToCart] = useState<Record<string, boolean>>({});
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
-
+  const router = useRouter();
   // Embla carousel setup
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false, // Changed from true to false
@@ -59,6 +60,11 @@ export function BestsellerPerfumes() {
       "(min-width: 1024px)": { slidesToScroll: 3 },
     },
   });
+
+  const goToProductPage = (perfumeId: string) => {
+    // Navigate to the product page with the selected perfume ID
+    router.push(`/product/${perfumeId}`);
+  };
 
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
   const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
@@ -328,8 +334,8 @@ export function BestsellerPerfumes() {
                               : "0 10px 30px -15px rgba(0,0,0,0.1)",
                           }}
                         >
-                          <Link
-                            href={`/product/${perfume._id}`}
+                          <motion.div
+                            onClick={() => goToProductPage(perfume._id)}
                             className="block h-full w-full"
                           >
                             <div className="relative h-full w-full bg-gray-100">
@@ -469,7 +475,7 @@ export function BestsellerPerfumes() {
                                 </motion.button>
                               </div>
                             </div>
-                          </Link>
+                          </motion.div>
                         </motion.div>
 
                         {/* Enhanced product details with animations and glass effect */}
@@ -485,9 +491,11 @@ export function BestsellerPerfumes() {
                             whileHover={{ x: 3 }}
                             transition={{ type: "spring", stiffness: 300 }}
                           >
-                            <Link href={`/product/${perfume._id}`}>
+                            <motion.div
+                              onClick={() => goToProductPage(perfume._id)}
+                            >
                               {perfume.name}
-                            </Link>
+                            </motion.div>
                           </motion.h3>
 
                           {/* Additional product info */}
@@ -546,13 +554,13 @@ export function BestsellerPerfumes() {
                               whileTap={{ scale: 0.95 }}
                               transition={{ type: "spring", stiffness: 300 }}
                             >
-                              <Link
-                                href={`/product/${perfume._id}`}
+                              <motion.a
+                                onClick={() => goToProductPage(perfume._id)}
                                 className="text-xs sm:text-sm text-amber-600 hover:text-amber-700 dark:text-amber-500 dark:hover:text-amber-400 transition-colors 
                                         border-b border-transparent hover:border-amber-600 dark:hover:border-amber-500"
                               >
                                 View Details
-                              </Link>
+                              </motion.a>
                             </motion.div>
                           </div>
                         </motion.div>

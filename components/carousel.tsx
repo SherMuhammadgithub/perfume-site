@@ -1,5 +1,4 @@
 "use client";
-
 import { useCart } from "app/context/cartContext";
 import axios from "axios";
 import useEmblaCarousel from "embla-carousel-react";
@@ -13,9 +12,11 @@ import { Perfume } from "lib/interfaces/data.type";
 import { ChevronLeft, ChevronRight, ShoppingBag, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export function FeaturedPerfumes() {
+  const router = useRouter();
   const [perfumes, setPerfumes] = useState<Perfume[]>([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
@@ -68,6 +69,10 @@ export function FeaturedPerfumes() {
     target: sectionRef,
     offset: ["start end", "end start"],
   });
+
+  const goToProductPage = (id: string) => {
+    router.push(`/product/${id}`);
+  };
 
   const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
@@ -302,9 +307,8 @@ export function FeaturedPerfumes() {
                               : "0 10px 30px -15px rgba(0,0,0,0.1)",
                           }}
                         >
-                          <Link
-                            href={`/product/${perfume._id}`}
-                            prefetch={true}
+                          <motion.div
+                            onClick={() => goToProductPage(perfume._id)}
                             className="block h-full w-full"
                           >
                             <div className="relative h-full w-full bg-gray-100">
@@ -413,7 +417,7 @@ export function FeaturedPerfumes() {
                                 </motion.button>
                               </div>
                             </div>
-                          </Link>
+                          </motion.div>
                         </motion.div>
 
                         {/* Enhanced product details with animations and glass effect */}
@@ -429,12 +433,11 @@ export function FeaturedPerfumes() {
                             whileHover={{ x: 3 }}
                             transition={{ type: "spring", stiffness: 300 }}
                           >
-                            <Link
-                              href={`/product/${perfume._id}`}
-                              prefetch={true}
+                            <motion.div
+                              onClick={() => goToProductPage(perfume._id)}
                             >
                               {perfume.name}
-                            </Link>
+                            </motion.div>
                           </motion.h3>
 
                           {/* Additional product info */}
@@ -492,14 +495,13 @@ export function FeaturedPerfumes() {
                               whileTap={{ scale: 0.95 }}
                               transition={{ type: "spring", stiffness: 300 }}
                             >
-                              <Link
-                                href={`/product/${perfume._id}`}
-                                prefetch={true}
+                              <motion.a
+                                onClick={() => goToProductPage(perfume._id)}
                                 className="text-xs sm:text-sm text-amber-600 hover:text-amber-700 dark:text-amber-500 dark:hover:text-amber-400 transition-colors 
                                     border-b border-transparent hover:border-amber-600 dark:hover:border-amber-500"
                               >
                                 View Details
-                              </Link>
+                              </motion.a>
                             </motion.div>
                           </div>
                         </motion.div>
