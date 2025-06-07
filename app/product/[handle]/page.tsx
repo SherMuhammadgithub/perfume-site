@@ -1,15 +1,8 @@
-import axios from "axios";
 import Footer from "components/layout/footer";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductClient from "./product";
 import { ProductImageGallery } from "./product-image-gallery";
-
-// Dynamically import the client component
-// const DynamicProductImageGallery = dynamic(() =>
-//   import('./product-image-gallery').then(mod => mod.ProductImageGallery),
-//   { ssr: false, loading: () => <ProductImageSkeleton /> }
-// );
 
 // Updated Perfume interface to match MongoDB schema
 interface PerfumeImage {
@@ -36,13 +29,21 @@ interface Perfume {
   collections?: string[];
 }
 
-// Function to fetch a product by handle on the server side
+// Server component can use relative paths
 async function getProduct(handle: string) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-    const response = await axios.get(`${baseUrl}/api/perfumes/${handle}`);
-    console.log("Fetched product:", response.data);
-    return response.data.perfume;
+    // No need for base URL when making internal API calls
+    const response = await fetch(`/api/perfumes/${handle}`, {
+      // Add this for Next.js to cache the request appropriately
+      cache: "no-store", // or 'force-cache' if you want caching behavior
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch product: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.perfume;
   } catch (error) {
     console.error("Failed to fetch product:", error);
     return null;
