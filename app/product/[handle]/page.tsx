@@ -53,11 +53,11 @@ export default async function ProductPage({
   params,
   searchParams, // Add this parameter
 }: {
-  params: { handle: string };
-  searchParams?: { [key: string]: string | string[] | undefined }; // Add this type
+  params: Promise<{ handle: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>; // Add this type
 }) {
   // Fetch the product using the handle parameter
-  const { handle } = params;
+  const { handle } = await params;
   const product = await getProduct(handle);
 
   // Return 404 if product not found
