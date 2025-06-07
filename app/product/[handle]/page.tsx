@@ -1,4 +1,4 @@
-import Footer from "components/layout/footer";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductClient from "./product";
@@ -29,14 +29,29 @@ interface Perfume {
   collections?: string[];
 }
 
-// Server component can use relative paths
+// Server component fetch with proper URL handling
 async function getProduct(handle: string) {
   try {
-    // No need for base URL when making internal API calls
-    const response = await fetch(`/api/perfumes/${handle}`, {
-      // Add this for Next.js to cache the request appropriately
-      cache: "no-store", // or 'force-cache' if you want caching behavior
-    });
+    // Get host from headers for reliable URL resolution in production
+    const headersList = await headers();
+    const host = headersList.get("host");
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+
+    // Build the full URL but still use relative format for the actual fetch
+    console.log(
+      `Fetching product from: ${protocol}://${host}/api/perfumes/${handle}`
+    );
+
+    const response = await fetch(
+      `${protocol}://${host}/api/perfumes/${handle}`,
+      {
+        cache: "no-store",
+        // This is the key change - Next.js needs to know this is a "self" request
+        next: {
+          tags: ["product", handle],
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to fetch product: ${response.status}`);
@@ -50,15 +65,14 @@ async function getProduct(handle: string) {
   }
 }
 
-export default async function ProductPage({
-  params,
-  searchParams, // Add this parameter
-}: {
-  params: Promise<{ handle: string }>;
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>; // Add this type
-}) {
+interface PageProps {
+  params: { handle: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+export default async function ProductPage({ params, searchParams }: PageProps) {
   // Fetch the product using the handle parameter
-  const { handle } = await params;
+  const { handle } = params;
   const product = await getProduct(handle);
 
   // Return 404 if product not found
@@ -112,30 +126,27 @@ export default async function ProductPage({
         }}
       />
 
-      <div className="mx-auto max-w-7xl px-4 py-4 md:py-10">
-        {/* Breadcrumbs */}
-        <div className="mb-4 text-sm">
-          <Link href="/" className="text-gray-500 hover:text-gray-700">
-            Home
-          </Link>
-          <span className="mx-2 text-gray-400">/</span>
-          <span className="text-gray-900">{product.name}</span>
+      {/* Breadcrumbs */}
+      <div className="mb-4 text-sm">
+        <Link href="/" className="text-gray-500 hover:text-gray-700">
+          Home
+        </Link>
+        <span className="mx-2 text-gray-400">/</span>
+        <span className="text-gray-900">{product.name}</span>
+      </div>
+
+      {/* Product Details Section */}
+      <div className="flex flex-col rounded-lg border border-neutral-200 p-4 sm:p-8 md:p-12 lg:flex-row lg:gap-8 bg-white shadow-sm">
+        {/* Product Images */}
+        <div className="h-full w-full basis-full lg:basis-3/5 mb-4">
+          <ProductImageGallery images={product.images} name={product.name} />
         </div>
 
-        {/* Product Details Section */}
-        <div className="flex flex-col rounded-lg border border-neutral-200 p-4 sm:p-8 md:p-12 lg:flex-row lg:gap-8 bg-white shadow-sm">
-          {/* Product Images */}
-          <div className="h-full w-full basis-full lg:basis-3/5 mb-4">
-            <ProductImageGallery images={product.images} name={product.name} />
-          </div>
-
-          {/* Product Details */}
-          <div className="basis-full lg:basis-2/5">
-            <ProductClient product={product} />
-          </div>
+        {/* Product Details */}
+        <div className="basis-full lg:basis-2/5">
+          <ProductClient product={product} />
         </div>
       </div>
-      <Footer />
     </>
   );
 }
