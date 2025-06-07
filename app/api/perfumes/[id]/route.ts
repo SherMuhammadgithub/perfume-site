@@ -6,13 +6,13 @@ import { NextResponse } from "next/server";
 // GET /api/perfumes/[id] - Get a single perfume
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
 
     // Access id directly without destructuring first
-    const id = params.id;
+    const id = (await params).id;
 
     let perfume;
 

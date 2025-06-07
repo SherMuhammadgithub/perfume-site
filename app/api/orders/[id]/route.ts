@@ -8,14 +8,15 @@ function isValidObjectId(id: string) {
   return mongoose.Types.ObjectId.isValid(id);
 }
 
-type RouteParams = { params: { id: string } };
-
 // GET /api/orders/[id] - Get a single order
-export async function GET(req: NextRequest, context: RouteParams) {
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     await dbConnect();
 
-    const { id } = context.params;
+    const { id } = await context.params;
 
     let order;
 
@@ -42,11 +43,14 @@ export async function GET(req: NextRequest, context: RouteParams) {
 }
 
 // PUT /api/orders/[id] - Update an order
-export async function PUT(req: NextRequest, context: RouteParams) {
+export async function PUT(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     await dbConnect();
 
-    const { id } = context.params;
+    const { id } = await context.params;
 
     if (!isValidObjectId(id)) {
       return NextResponse.json({ error: "Invalid order ID" }, { status: 400 });
@@ -80,11 +84,14 @@ export async function PUT(req: NextRequest, context: RouteParams) {
 }
 
 // DELETE /api/orders/[id] - Delete an order (restricted operation)
-export async function DELETE(req: NextRequest, context: RouteParams) {
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     await dbConnect();
 
-    const { id } = context.params;
+    const { id } = await context.params;
 
     if (!isValidObjectId(id)) {
       return NextResponse.json({ error: "Invalid order ID" }, { status: 400 });
