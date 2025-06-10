@@ -1,5 +1,4 @@
 import axios from "axios";
-import Footer from "components/layout/footer";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductClient from "./product";
@@ -134,7 +133,6 @@ export default async function ProductPage({
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 }
