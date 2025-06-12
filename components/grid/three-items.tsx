@@ -52,7 +52,7 @@ function CollectionCard({
     >
       <Link href={`/search?q=${encodedName}`}>
         <motion.div
-          className="card relative overflow-hidden rounded-xl shadow-lg h-72 sm:h-80 md:h-96 cursor-pointer"
+          className="card relative overflow-hidden rounded-xl shadow-lg dark:shadow-gray-800/30 h-72 sm:h-80 md:h-96 cursor-pointer"
           whileHover={{ y: -8 }}
           transition={{ type: "spring", stiffness: 300, damping: 15 }}
         >
@@ -69,15 +69,15 @@ function CollectionCard({
                   priority
                 />
                 <motion.div
-                  className="absolute inset-0 bg-black"
+                  className="absolute inset-0 bg-black dark:bg-black/50"
                   initial={{ opacity: 0 }}
                   whileHover={{ opacity: 0.2 }}
                   transition={{ duration: 0.3 }}
                 />
               </motion.div>
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                <span className="text-gray-400 text-lg sm:text-2xl font-playfair italic">
+              <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+                <span className="text-gray-400 dark:text-gray-500 text-lg sm:text-2xl font-playfair italic">
                   No Image
                 </span>
               </div>
@@ -85,7 +85,7 @@ function CollectionCard({
           </div>
 
           {/* Overlay with gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent dark:from-black/90 dark:via-black/50"></div>
 
           {/* Content layer */}
           <div className="absolute inset-x-0 bottom-0 flex flex-col items-center z-10 p-6">
@@ -125,8 +125,10 @@ function CollectionCard({
               >
                 <motion.button
                   className={`${
-                    isFeatured ? "bg-amber-500" : "bg-white"
-                  } ${isFeatured ? "text-white" : "text-black"} px-6 py-2.5 rounded-full text-xs uppercase tracking-widest font-medium shadow-md`}
+                    isFeatured
+                      ? "bg-amber-500 hover:bg-amber-600"
+                      : "bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+                  } ${isFeatured ? "text-white" : "text-black dark:text-white"} px-6 py-2.5 rounded-full text-xs uppercase tracking-widest font-medium shadow-md`}
                   whileHover={{
                     scale: 1.05,
                     boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
@@ -165,14 +167,14 @@ function CollectionCard({
 function SkeletonCard({ delay = 0 }) {
   return (
     <motion.div
-      className="rounded-xl shadow-md h-72 sm:h-80 md:h-96 bg-gray-100 overflow-hidden"
+      className="rounded-xl shadow-md h-72 sm:h-80 md:h-96 bg-gray-100 dark:bg-gray-800 overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay }}
     >
       <div className="w-full h-full relative">
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-gray-200 to-gray-300"
+          className="absolute inset-0 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600"
           animate={{
             backgroundPosition: ["0% 0%", "100% 100%"],
           }}
@@ -187,7 +189,7 @@ function SkeletonCard({ delay = 0 }) {
       <div className="absolute inset-x-0 bottom-0 p-6">
         <div className="space-y-3">
           <motion.div
-            className="h-6 w-3/4 mx-auto bg-white bg-opacity-70 rounded"
+            className="h-6 w-3/4 mx-auto bg-white dark:bg-gray-600 bg-opacity-70 dark:bg-opacity-50 rounded"
             animate={{ opacity: [0.5, 0.8, 0.5] }}
             transition={{
               repeat: Infinity,
@@ -196,7 +198,7 @@ function SkeletonCard({ delay = 0 }) {
             }}
           />
           <motion.div
-            className="h-4 w-5/6 mx-auto bg-white bg-opacity-60 rounded"
+            className="h-4 w-5/6 mx-auto bg-white dark:bg-gray-600 bg-opacity-60 dark:bg-opacity-40 rounded"
             animate={{ opacity: [0.5, 0.7, 0.5] }}
             transition={{
               repeat: Infinity,
@@ -206,7 +208,7 @@ function SkeletonCard({ delay = 0 }) {
             }}
           />
           <motion.div
-            className="h-10 w-40 mx-auto bg-white bg-opacity-80 rounded-full mt-4"
+            className="h-10 w-40 mx-auto bg-white dark:bg-gray-500 bg-opacity-80 dark:bg-opacity-60 rounded-full mt-4"
             animate={{ opacity: [0.6, 0.9, 0.6] }}
             transition={{
               repeat: Infinity,
@@ -263,7 +265,7 @@ export function ThreeItemGrid() {
         viewport={{ once: true }}
       >
         <motion.h2
-          className="text-3xl sm:text-4xl md:text-5xl tracking-wider mb-4 font-playfair font-medium"
+          className="text-3xl sm:text-4xl md:text-5xl tracking-wider mb-4 font-playfair font-medium text-gray-900 dark:text-gray-100"
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
@@ -273,7 +275,7 @@ export function ThreeItemGrid() {
         </motion.h2>
 
         <motion.div
-          className="w-28 h-0.5 bg-amber-700 mx-auto"
+          className="w-28 h-0.5 bg-amber-700 dark:bg-amber-600 mx-auto"
           initial={{ width: 0 }}
           whileInView={{ width: 112 }}
           transition={{ duration: 1, delay: 0.3 }}
@@ -281,7 +283,7 @@ export function ThreeItemGrid() {
         />
 
         <motion.p
-          className="mt-5 text-gray-600 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed"
+          className="mt-5 text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
@@ -331,23 +333,25 @@ export function ThreeItemGrid() {
         transition={{ duration: 0.5, delay: 0.6 }}
         viewport={{ once: true }}
       >
-        <Link href="/search">
-          <motion.button
-            className="bg-black text-white px-8 py-3 rounded-full text-sm uppercase tracking-widest font-medium flex items-center group"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        <Link
+          href="/search"
+          className="relative inline-flex items-center gap-2 px-8 py-3 bg-black dark:bg-white dark:text-black text-white 
+                        font-medium text-sm sm:text-base rounded-full transition-all duration-300 
+                        shadow-sm hover:shadow-md"
+        >
+          <span>Explore All Collections</span>
+          <motion.span
+            animate={{
+              x: [0, 4, 0],
+            }}
+            transition={{
+              repeat: Infinity,
+              repeatDelay: 1.5,
+              duration: 1,
+            }}
           >
-            <span>View All Collections</span>
-            <motion.span
-              className="ml-2 text-lg"
-              initial={{ x: 0 }}
-              animate={{ x: [0, 5, 0] }}
-              transition={{ repeat: Infinity, repeatDelay: 1, duration: 1 }}
-            >
-              →
-            </motion.span>
-          </motion.button>
+            →
+          </motion.span>
         </Link>
       </motion.div>
     </motion.div>

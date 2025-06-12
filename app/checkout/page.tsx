@@ -311,7 +311,7 @@ export default function CheckoutPage() {
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-black focus:border-black text-gray-900"
                   whileFocus={{ boxShadow: "0 0 0 2px rgba(0,0,0,0.1)" }}
-                  placeholder="John Doe"
+                  placeholder="Enter Full Name"
                 />
               </motion.div>
 
@@ -331,7 +331,7 @@ export default function CheckoutPage() {
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-black focus:border-black text-gray-900"
                   whileFocus={{ boxShadow: "0 0 0 2px rgba(0,0,0,0.1)" }}
-                  placeholder="your@email.com"
+                  placeholder="Enter Email"
                 />
               </motion.div>
 
@@ -351,7 +351,7 @@ export default function CheckoutPage() {
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-black focus:border-black text-gray-900"
                   whileFocus={{ boxShadow: "0 0 0 2px rgba(0,0,0,0.1)" }}
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="+92 317 4396952"
                 />
               </motion.div>
             </motion.div>
@@ -412,7 +412,7 @@ export default function CheckoutPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-black focus:border-black text-gray-900"
                     whileFocus={{ boxShadow: "0 0 0 2px rgba(0,0,0,0.1)" }}
-                    placeholder="New York"
+                    placeholder="Enter City Name"
                   />
                 </motion.div>
 
@@ -432,7 +432,7 @@ export default function CheckoutPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-black focus:border-black text-gray-900"
                     whileFocus={{ boxShadow: "0 0 0 2px rgba(0,0,0,0.1)" }}
-                    placeholder="10001"
+                    placeholder="Enter Postal Code"
                   />
                 </motion.div>
 
@@ -452,7 +452,7 @@ export default function CheckoutPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-black focus:border-black text-gray-900"
                     whileFocus={{ boxShadow: "0 0 0 2px rgba(0,0,0,0.1)" }}
-                    placeholder="United States"
+                    placeholder="Enter Country Name"
                   />
                 </motion.div>
               </motion.div>
@@ -526,7 +526,7 @@ export default function CheckoutPage() {
                             delay: 0.3 + index * 0.1,
                           }}
                         >
-                          ${(item.price * item.quantity).toFixed(2)}
+                          Rs. {(item.price * item.quantity).toFixed(2)}
                         </motion.p>
                       </div>
                       <p className="mt-1 text-sm text-gray-500 font-medium">
@@ -557,7 +557,7 @@ export default function CheckoutPage() {
                 variants={itemVariants}
               >
                 <span className="text-gray-600">Subtotal</span>
-                <span className="font-medium">${subtotal.toFixed(2)}</span>
+                <span className="font-medium">Rs. {subtotal.toFixed(2)}</span>
               </motion.div>
 
               <motion.div
@@ -594,7 +594,7 @@ export default function CheckoutPage() {
                 variants={itemVariants}
               >
                 <span className="text-gray-600">Tax (8%)</span>
-                <span className="font-medium">${tax.toFixed(2)}</span>
+                <span className="font-medium">Rs. {tax.toFixed(2)}</span>
               </motion.div>
 
               <motion.div
@@ -619,7 +619,7 @@ export default function CheckoutPage() {
                     delay: 1,
                   }}
                 >
-                  ${total.toFixed(2)}
+                  Rs. {total.toFixed(2)}
                 </motion.span>
               </motion.div>
             </motion.div>

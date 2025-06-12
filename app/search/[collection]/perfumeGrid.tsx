@@ -94,7 +94,7 @@ export default function PerfumeGrid({
     return currentQuantityInCart >= perfume.stock;
   };
 
-  // Helper function to get button text based on sto`ck
+  // Helper function to get button text based on stock
   const getButtonText = (perfume: Perfume): string => {
     if (addedToCart[perfume._id]) {
       return "✓ Added to Cart";
@@ -129,7 +129,7 @@ export default function PerfumeGrid({
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <motion.p
-          className="text-sm text-gray-500 mb-2 sm:mb-0"
+          className="text-sm text-gray-500 dark:text-gray-400 mb-2 sm:mb-0"
           animate={{
             scale: filteredPerfumes.length > 0 ? [1, 1.05, 1] : 1,
           }}
@@ -144,11 +144,13 @@ export default function PerfumeGrid({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <label className="text-sm text-gray-500 mr-2">Sort by:</label>
+          <label className="text-sm text-gray-500 dark:text-gray-400 mr-2">
+            Sort by:
+          </label>
           <motion.select
             value={sortOption}
             onChange={handleSortChangeAction}
-            className="text-sm border-gray-300 rounded-md focus:ring-amber-500 focus:border-amber-500"
+            className="text-sm border-gray-300 dark:border-gray-600 rounded-md focus:ring-amber-500 focus:border-amber-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -177,7 +179,7 @@ export default function PerfumeGrid({
               return (
                 <motion.div
                   key={perfume._id}
-                  className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                  className="group relative bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/10 overflow-hidden hover:shadow-lg dark:hover:shadow-gray-900/20 transition-shadow duration-300"
                   variants={cardVariants}
                   initial="hidden"
                   animate="visible"
@@ -193,7 +195,7 @@ export default function PerfumeGrid({
                     whileHover={{ scale: 1.03 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
-                    <div className="h-64 relative bg-gray-50">
+                    <div className="h-64 relative bg-gray-50 dark:bg-gray-700">
                       {perfume.images && perfume.images.length > 0 ? (
                         <Image
                           src={perfume.images[0]?.url || "/placeholder.png"}
@@ -206,8 +208,8 @@ export default function PerfumeGrid({
                           priority={false}
                         />
                       ) : (
-                        <div className="absolute inset-0 bg-gray-200 bg-gradient-to-b from-transparent to-gray-100 flex items-center justify-center">
-                          <span className="text-2xl font-light text-gray-500">
+                        <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 bg-gradient-to-b from-transparent to-gray-100 dark:to-gray-700 flex items-center justify-center">
+                          <span className="text-2xl font-light text-gray-500 dark:text-gray-400">
                             {perfume.name}
                           </span>
                         </div>
@@ -217,7 +219,7 @@ export default function PerfumeGrid({
                       <div className="absolute top-2 left-2 flex flex-col gap-2 z-10">
                         {perfume.isNew && (
                           <motion.span
-                            className="bg-black text-center text-white text-xs px-2 py-1 rounded-full"
+                            className="bg-black dark:bg-gray-900 text-center text-white text-xs px-2 py-1 rounded-full"
                             initial={{ opacity: 0, scale: 0.8, x: -20 }}
                             animate={{ opacity: 1, scale: 1, x: 0 }}
                             transition={{ type: "spring" }}
@@ -249,10 +251,12 @@ export default function PerfumeGrid({
                     </div>
                   </motion.div>
                   <div className="p-4">
-                    <h3 className="text-lg font-medium text-gray-900">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                       {perfume.name}
                     </h3>
-                    <p className="text-sm text-gray-500">{perfume.brand}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {perfume.brand}
+                    </p>
                     <motion.div
                       className="mt-2 flex items-center"
                       initial={{ opacity: 0 }}
@@ -266,7 +270,7 @@ export default function PerfumeGrid({
                           className={`h-4 w-4 ${
                             i < Math.floor(perfume.averageRating)
                               ? "text-yellow-400"
-                              : "text-gray-300"
+                              : "text-gray-300 dark:text-gray-600"
                           }`}
                           viewBox="0 0 20 20"
                           fill="currentColor"
@@ -277,7 +281,7 @@ export default function PerfumeGrid({
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </motion.svg>
                       ))}
-                      <span className="ml-1 text-xs text-gray-500">
+                      <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">
                         {perfume.averageRating}
                       </span>
                     </motion.div>
@@ -291,23 +295,23 @@ export default function PerfumeGrid({
                       perfume.discountPrice !== null ? (
                         <div className="flex items-center space-x-2">
                           <motion.p
-                            className="text-lg font-medium text-red-600"
+                            className="text-lg font-medium text-red-600 dark:text-red-400"
                             initial={{ scale: 0.8 }}
                             animate={{ scale: 1 }}
                             transition={{ type: "spring" }}
                           >
-                            $
+                            Rs.{" "}
                             {(typeof perfume.discountPrice === "number"
                               ? perfume.discountPrice
                               : parseFloat(String(perfume.discountPrice))
                             ).toFixed(2)}
                           </motion.p>
                           <motion.p
-                            className="text-sm text-gray-500 line-through"
+                            className="text-sm text-gray-500 dark:text-gray-400 line-through"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 0.8 }}
                           >
-                            $
+                            Rs.{" "}
                             {(typeof perfume.price === "number"
                               ? perfume.price
                               : parseFloat(String(perfume.price))
@@ -316,22 +320,22 @@ export default function PerfumeGrid({
                         </div>
                       ) : (
                         <motion.p
-                          className="text-lg font-medium text-gray-900"
+                          className="text-lg font-medium text-gray-900 dark:text-gray-100"
                           initial={{ scale: 0.8 }}
                           animate={{ scale: 1 }}
                           transition={{ type: "spring" }}
                         >
-                          $
+                          Rs.{" "}
                           {(typeof perfume.price === "number"
                             ? perfume.price
                             : parseFloat(String(perfume.price))
                           ).toFixed(2)}
                         </motion.p>
                       )}
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {perfume.volume}{" "}
                         {perfume.stock > 0 && (
-                          <span className="ml-2 text-xs text-gray-400">
+                          <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">
                             ({perfume.stock} in stock)
                           </span>
                         )}
@@ -343,10 +347,10 @@ export default function PerfumeGrid({
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.4 }}
                     >
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
                         {perfume.category}
                       </span>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
                         {perfume.gender}
                       </span>
                     </motion.div>
@@ -359,10 +363,10 @@ export default function PerfumeGrid({
                       <motion.button
                         className={`w-full ${
                           addedToCart[perfume._id]
-                            ? "bg-green-600 hover:bg-green-700"
+                            ? "bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
                             : isMaxedOut
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-black hover:bg-gray-700"
+                              ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
+                              : "bg-black dark:bg-gray-900 hover:bg-gray-700 dark:hover:bg-gray-800"
                         } text-white py-2 px-4 rounded-md transition-colors duration-200`}
                         onClick={() => handleAddToCart(perfume)}
                         whileHover={!isMaxedOut ? { scale: 1.02 } : {}}
@@ -380,14 +384,14 @@ export default function PerfumeGrid({
         </motion.div>
       ) : (
         <motion.div
-          className="text-center py-16 bg-white rounded-lg shadow"
+          className="text-center py-16 bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-900/10"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
           <motion.svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-16 w-16 text-gray-400 mx-auto"
+            className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -403,7 +407,7 @@ export default function PerfumeGrid({
             />
           </motion.svg>
           <motion.h3
-            className="mt-4 text-lg font-medium text-gray-900"
+            className="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -411,7 +415,7 @@ export default function PerfumeGrid({
             No products found
           </motion.h3>
           <motion.p
-            className="mt-1 text-gray-500"
+            className="mt-1 text-gray-500 dark:text-gray-400"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -420,7 +424,7 @@ export default function PerfumeGrid({
           </motion.p>
           <motion.button
             onClick={resetFiltersAction}
-            className="mt-6 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            className="mt-6 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black dark:bg-gray-900 hover:bg-gray-700 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-gray-400 dark:focus:ring-offset-gray-800"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             initial={{ opacity: 0, y: 10 }}

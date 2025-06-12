@@ -525,7 +525,7 @@ export function BestsellerPerfumes() {
                                       transition: { duration: 0.2 },
                                     }}
                                   >
-                                    PKR {perfume.discountPrice.toFixed(2)}
+                                    Rs. {perfume.discountPrice.toFixed(2)}
                                   </motion.span>
                                   <motion.span
                                     className="text-gray-500 text-xs sm:text-sm line-through"
@@ -533,7 +533,7 @@ export function BestsellerPerfumes() {
                                     animate={{ opacity: 0.7 }}
                                     transition={{ delay: 0.45 + index * 0.1 }}
                                   >
-                                    PKR {perfume.price.toFixed(2)}
+                                    Rs. {perfume.price.toFixed(2)}
                                   </motion.span>
                                 </>
                               ) : (
@@ -544,7 +544,7 @@ export function BestsellerPerfumes() {
                                   transition={{ delay: 0.4 + index * 0.1 }}
                                   whileHover={{ scale: 1.05 }}
                                 >
-                                  PKR {perfume.price.toFixed(2)}
+                                  Rs. {perfume.price.toFixed(2)}
                                 </motion.span>
                               )}
                             </div>

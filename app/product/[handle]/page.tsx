@@ -110,18 +110,23 @@ export default async function ProductPage({
         }}
       />
 
-      <div className="mx-auto max-w-7xl px-4 py-4 md:py-10">
-        {/* Breadcrumbs */}
+      <div className="mx-auto max-w-7xl px-2 py-4 ">
+        {/* Breadcrumbs with dark mode */}
         <div className="mb-4 text-sm">
-          <Link href="/" className="text-gray-500 hover:text-gray-700">
+          <Link
+            href="/"
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+          >
             Home
           </Link>
-          <span className="mx-2 text-gray-400">/</span>
-          <span className="text-gray-900">{product.name}</span>
+          <span className="mx-2 text-gray-400 dark:text-gray-600">/</span>
+          <span className="text-gray-900 dark:text-gray-200">
+            {product.name}
+          </span>
         </div>
 
-        {/* Product Details Section */}
-        <div className="flex flex-col rounded-lg border border-neutral-200 p-4 sm:p-8 md:p-12 lg:flex-row lg:gap-8 bg-white shadow-sm">
+        {/* Product Details Section with dark mode */}
+        <div className="flex flex-col rounded-lg border border-neutral-200 dark:border-neutral-800 p-4 sm:p-8 md:p-12 lg:flex-row lg:gap-8 bg-white dark:bg-gray-900 shadow-sm dark:shadow-gray-900/20">
           {/* Product Images */}
           <div className="h-full w-full basis-full lg:basis-3/5 mb-4">
             <ProductImageGallery images={product.images} name={product.name} />

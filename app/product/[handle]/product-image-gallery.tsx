@@ -53,7 +53,7 @@ export function ProductImageGallery({
         transition={{ duration: 0.5 }}
       >
         <motion.div
-          className="aspect-square relative overflow-hidden bg-gray-50 rounded-lg border border-gray-100 cursor-zoom-in"
+          className="aspect-square relative overflow-hidden bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 cursor-zoom-in"
           onClick={() => setIsZoomOpen(true)}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
@@ -95,7 +95,7 @@ export function ProductImageGallery({
 
           {/* Zoom icon overlay with animation */}
           <motion.div
-            className="absolute bottom-3 right-3 bg-white bg-opacity-70 p-1.5 rounded-full shadow-md z-10"
+            className="absolute bottom-3 right-3 bg-white dark:bg-gray-800 bg-opacity-70 dark:bg-opacity-70 p-1.5 rounded-full shadow-md dark:shadow-black/30 z-10"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{
@@ -110,7 +110,7 @@ export function ProductImageGallery({
             }}
             whileTap={{ scale: 0.9 }}
           >
-            <ZoomIn size={18} className="text-gray-700" />
+            <ZoomIn size={18} className="text-gray-700 dark:text-gray-300" />
           </motion.div>
         </motion.div>
       </motion.div>
@@ -129,8 +129,8 @@ export function ProductImageGallery({
               className={`w-16 h-16 border-2 rounded-md overflow-hidden 
                 ${
                   image.url === selectedImage?.url
-                    ? "border-amber-500"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-amber-500 dark:border-amber-600"
+                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                 } 
                 cursor-pointer transition-colors`}
               onClick={() => handleThumbnailClick(image)}
@@ -147,7 +147,7 @@ export function ProductImageGallery({
                 delay: index * 0.05,
               }}
             >
-              <div className="relative h-full w-full">
+              <div className="relative h-full w-full bg-gray-50 dark:bg-gray-800">
                 <Image
                   src={image.url}
                   alt={image.alt || `${name} - View ${index + 1}`}
@@ -182,16 +182,16 @@ export function ProductImageGallery({
               {/* Close button with animation */}
               <motion.button
                 onClick={() => setIsZoomOpen(false)}
-                className="absolute top-2 right-2 z-10 bg-white rounded-full p-1.5 shadow-md"
+                className="absolute top-2 right-2 z-10 bg-white dark:bg-gray-800 rounded-full p-1.5 shadow-md dark:shadow-black/50"
                 whileHover={{ scale: 1.1, backgroundColor: "#f3f4f6" }}
                 whileTap={{ scale: 0.9 }}
               >
-                <X size={24} className="text-gray-800" />
+                <X size={24} className="text-gray-800 dark:text-gray-200" />
               </motion.button>
 
               {/* Zoomed image with animation */}
               <motion.div
-                className="relative w-full h-auto bg-white rounded-lg overflow-hidden"
+                className="relative w-full h-auto bg-white dark:bg-gray-900 rounded-lg overflow-hidden"
                 layoutId="zoomableImage"
               >
                 <div className="aspect-square relative">
@@ -210,7 +210,7 @@ export function ProductImageGallery({
               {/* Thumbnails in modal with animation */}
               {images.length > 1 && (
                 <motion.div
-                  className="flex gap-2 mt-4 overflow-x-auto py-2 px-4 bg-white bg-opacity-90 rounded-lg"
+                  className="flex gap-2 mt-4 overflow-x-auto py-2 px-4 bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-90 rounded-lg"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
@@ -224,8 +224,8 @@ export function ProductImageGallery({
                       className={`flex-shrink-0 w-16 h-16 border-2 rounded-md overflow-hidden 
                         ${
                           image.url === selectedImage?.url
-                            ? "border-amber-500"
-                            : "border-gray-200 hover:border-gray-300"
+                            ? "border-amber-500 dark:border-amber-600"
+                            : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                         } 
                         cursor-pointer transition-colors`}
                       onClick={() => handleThumbnailClick(image)}
@@ -241,7 +241,7 @@ export function ProductImageGallery({
                         },
                       }}
                     >
-                      <div className="relative h-full w-full">
+                      <div className="relative h-full w-full bg-gray-50 dark:bg-gray-700">
                         <Image
                           src={image.url}
                           alt={image.alt || `${name} - View ${index + 1}`}

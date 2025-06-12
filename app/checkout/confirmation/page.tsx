@@ -302,7 +302,7 @@ export default function OrderConfirmation() {
                     {item.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                    ${item.price.toFixed(2)}
+                    Rs. {item.price.toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
                     {item.quantity}
@@ -312,7 +312,7 @@ export default function OrderConfirmation() {
                       initial={{ fontWeight: 400 }}
                       whileHover={{ fontWeight: 500 }}
                     >
-                      ${(item.price * item.quantity).toFixed(2)}
+                      Rs. {(item.price * item.quantity).toFixed(2)}
                     </motion.span>
                   </td>
                 </motion.tr>
@@ -340,7 +340,7 @@ export default function OrderConfirmation() {
             >
               <span className="text-sm text-gray-700">Subtotal</span>
               <span className="text-sm font-medium">
-                ${order.subtotal.toFixed(2)}
+                Rs. {order.subtotal.toFixed(2)}
               </span>
             </motion.div>
             <motion.div
@@ -353,7 +353,7 @@ export default function OrderConfirmation() {
               <span className="text-sm font-medium">
                 {order.shippingCost === 0
                   ? "Free"
-                  : `$${order.shippingCost.toFixed(2)}`}
+                  : `Rs. ${order.shippingCost.toFixed(2)}`}
               </span>
             </motion.div>
             <motion.div
@@ -364,7 +364,7 @@ export default function OrderConfirmation() {
             >
               <span className="text-sm text-gray-700">Tax</span>
               <span className="text-sm font-medium">
-                ${order.tax.toFixed(2)}
+                Rs. {order.tax.toFixed(2)}
               </span>
             </motion.div>
             <motion.div
@@ -381,7 +381,7 @@ export default function OrderConfirmation() {
                   transition: { delay: 1.5, duration: 0.5 },
                 }}
               >
-                ${order.total.toFixed(2)}
+                Rs. {order.total.toFixed(2)}
               </motion.span>
             </motion.div>
           </motion.div>

@@ -41,17 +41,17 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
             Sign in to your account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{" "}
             <Link
               href="/register"
-              className="font-medium text-black hover:text-gray-800"
+              className="font-medium text-black dark:text-amber-500 hover:text-gray-800 dark:hover:text-amber-400"
             >
               create a new account
             </Link>
@@ -63,7 +63,7 @@ function LoginForm() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Email address
               </label>
@@ -75,14 +75,16 @@ function LoginForm() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-black focus:border-black"
+                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                focus:outline-none focus:ring-amber-500 focus:border-amber-500 dark:focus:ring-amber-600 dark:focus:border-amber-600"
               />
             </div>
 
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Password
               </label>
@@ -94,7 +96,9 @@ function LoginForm() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-black focus:border-black"
+                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                focus:outline-none focus:ring-amber-500 focus:border-amber-500 dark:focus:ring-amber-600 dark:focus:border-amber-600"
               />
             </div>
           </div>
@@ -102,7 +106,7 @@ function LoginForm() {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black dark:bg-amber-600 hover:bg-gray-800 dark:hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black dark:focus:ring-amber-600 dark:focus:ring-offset-gray-900"
             >
               {loading ? (
                 <svg
@@ -131,7 +135,9 @@ function LoginForm() {
           </div>
 
           {formError && (
-            <div className="text-red-500 text-sm text-center">{formError}</div>
+            <div className="text-red-500 dark:text-red-400 text-sm text-center bg-red-50 dark:bg-red-900/20 p-2 rounded-md">
+              {formError}
+            </div>
           )}
         </form>
       </div>
@@ -148,17 +154,17 @@ export default function LoginPage() {
   );
 }
 
-// Simple loading skeleton
+// Simple loading skeleton with dark mode
 function LoginSkeleton() {
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4">
+    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 bg-white dark:bg-gray-900">
       <div className="max-w-md w-full space-y-8 animate-pulse">
-        <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto"></div>
-        <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mx-auto"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mx-auto"></div>
         <div className="space-y-4">
-          <div className="h-12 bg-gray-200 rounded"></div>
-          <div className="h-12 bg-gray-200 rounded"></div>
-          <div className="h-12 bg-gray-200 rounded"></div>
+          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
         </div>
       </div>
     </div>

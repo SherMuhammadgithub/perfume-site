@@ -80,7 +80,7 @@ export default function FilterSidebar({
         animate="visible"
       >
         <motion.div
-          className="sticky top-20 bg-white p-6 rounded-lg border border-gray-200 shadow-sm"
+          className="sticky top-20 bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-900/10"
           layout
           transition={{ duration: 0.3 }}
         >
@@ -88,10 +88,12 @@ export default function FilterSidebar({
             className="flex justify-between items-center mb-6"
             variants={itemVariants}
           >
-            <h2 className="text-lg font-medium">Filters</h2>
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              Filters
+            </h2>
             <motion.button
               onClick={resetFilters}
-              className="text-sm text-amber-600 hover:text-amber-700"
+              className="text-sm text-amber-600 hover:text-amber-700 dark:text-amber-500 dark:hover:text-amber-400"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -101,8 +103,10 @@ export default function FilterSidebar({
 
           {/* Collections Filter */}
           <motion.div className="mb-6" variants={itemVariants}>
-            <h3 className="text-md font-medium mb-2">Collections</h3>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
+            <h3 className="text-md font-medium mb-2 text-gray-900 dark:text-gray-100">
+              Collections
+            </h3>
+            <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
               {collections.map((collection, index) => (
                 <motion.div
                   key={collection.id}
@@ -117,11 +121,11 @@ export default function FilterSidebar({
                     id={`collection-${collection.id}`}
                     checked={filters.collection.includes(collection.name)}
                     onChange={() => toggleFilter("collection", collection.name)}
-                    className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-amber-600 focus:ring-amber-500 dark:focus:ring-amber-400 dark:bg-gray-700"
                   />
                   <motion.label
                     htmlFor={`collection-${collection.id}`}
-                    className="ml-2 text-sm text-gray-700"
+                    className="ml-2 text-sm text-gray-700 dark:text-gray-300"
                     animate={{
                       fontWeight: filters.collection.includes(collection.name)
                         ? 600
@@ -137,7 +141,9 @@ export default function FilterSidebar({
 
           {/* Gender Filter */}
           <motion.div className="mb-6" variants={itemVariants}>
-            <h3 className="text-md font-medium mb-2">Gender</h3>
+            <h3 className="text-md font-medium mb-2 text-gray-900 dark:text-gray-100">
+              Gender
+            </h3>
             <div className="space-y-2">
               {genders.map((gender, index) => (
                 <motion.div
@@ -153,11 +159,11 @@ export default function FilterSidebar({
                     id={`gender-${gender}`}
                     checked={filters.gender.includes(gender)}
                     onChange={() => toggleFilter("gender", gender)}
-                    className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-amber-600 focus:ring-amber-500 dark:focus:ring-amber-400 dark:bg-gray-700"
                   />
                   <motion.label
                     htmlFor={`gender-${gender}`}
-                    className="ml-2 text-sm text-gray-700"
+                    className="ml-2 text-sm text-gray-700 dark:text-gray-300"
                     animate={{
                       fontWeight: filters.gender.includes(gender) ? 600 : 400,
                     }}
@@ -171,29 +177,35 @@ export default function FilterSidebar({
 
           {/* Price Range Filter */}
           <motion.div className="mt-6" variants={itemVariants}>
-            <h3 className="text-sm font-medium mb-2">Price Range</h3>
+            <h3 className="text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">
+              Price Range
+            </h3>
             <div className="flex items-center justify-between mb-2">
               <motion.span
-                className="text-xs text-gray-500"
+                className="text-xs text-gray-500 dark:text-white"
                 animate={{
                   scale: [1, 1.1, 1],
                   color:
-                    filters.price.min > priceRange.min ? "#f59e0b" : "#6b7280",
+                    filters.price.min > priceRange.min
+                      ? "var(--color-amber-500)"
+                      : "var(--color-gray-500)",
                 }}
                 transition={{ duration: 0.3 }}
               >
-                ${filters.price.min}
+                Rs. {filters.price.min}
               </motion.span>
               <motion.span
-                className="text-xs text-gray-500"
+                className="text-xs text-gray-500 dark:text-white"
                 animate={{
                   scale: [1, 1.1, 1],
                   color:
-                    filters.price.max < priceRange.max ? "#f59e0b" : "#6b7280",
+                    filters.price.max < priceRange.max
+                      ? "var(--color-amber-500)"
+                      : "var(--color-gray-500)",
                 }}
                 transition={{ duration: 0.3 }}
               >
-                ${filters.price.max}
+                Rs. {filters.price.max}
               </motion.span>
             </div>
             <motion.input
@@ -205,7 +217,7 @@ export default function FilterSidebar({
               onChange={(e) =>
                 updatePriceRange(Number(e.target.value), filters.price.max)
               }
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-amber-500"
               whileHover={{ scale: 1.02 }}
             />
             <motion.input
@@ -217,14 +229,16 @@ export default function FilterSidebar({
               onChange={(e) =>
                 updatePriceRange(filters.price.min, Number(e.target.value))
               }
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2"
+              className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer mt-2 accent-amber-500"
               whileHover={{ scale: 1.02 }}
             />
           </motion.div>
 
           {/* Rating Filter */}
           <motion.div className="mb-6 mt-6" variants={itemVariants}>
-            <h3 className="text-md font-medium mb-2">Rating</h3>
+            <h3 className="text-md font-medium mb-2 text-gray-900 dark:text-gray-100">
+              Rating
+            </h3>
             <div className="flex items-center space-x-2">
               {[1, 2, 3, 4, 5].map((rating) => (
                 <motion.button
@@ -235,7 +249,7 @@ export default function FilterSidebar({
                   className={`h-8 w-8 flex items-center justify-center rounded-full ${
                     filters.rating >= rating
                       ? "bg-amber-500 text-white"
-                      : "bg-gray-100 text-gray-400"
+                      : "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500"
                   }`}
                   whileHover={{ scale: 1.15 }}
                   whileTap={{ scale: 0.95 }}
@@ -259,7 +273,7 @@ export default function FilterSidebar({
               ))}
               {filters.rating > 0 && (
                 <motion.span
-                  className="text-sm text-gray-600"
+                  className="text-sm text-gray-600 dark:text-gray-400"
                   initial={{ opacity: 0, x: -5 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -5 }}
@@ -272,7 +286,9 @@ export default function FilterSidebar({
 
           {/* Other Filters */}
           <motion.div className="mb-6" variants={itemVariants}>
-            <h3 className="text-md font-medium mb-2">Other Filters</h3>
+            <h3 className="text-md font-medium mb-2 text-gray-900 dark:text-gray-100">
+              Other Filters
+            </h3>
             <div className="space-y-2">
               <motion.div
                 className="flex items-center"
@@ -290,11 +306,11 @@ export default function FilterSidebar({
                   id="only-new"
                   checked={filters.onlyNew}
                   onChange={() => toggleBooleanFilter("onlyNew")}
-                  className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-amber-600 focus:ring-amber-500 dark:focus:ring-amber-400 dark:bg-gray-700"
                 />
                 <motion.label
                   htmlFor="only-new"
-                  className="ml-2 text-sm text-gray-700"
+                  className="ml-2 text-sm text-gray-700 dark:text-gray-300"
                   animate={{ fontWeight: filters.onlyNew ? 600 : 400 }}
                 >
                   New Arrivals
@@ -316,11 +332,11 @@ export default function FilterSidebar({
                   id="only-bestseller"
                   checked={filters.onlyBestseller}
                   onChange={() => toggleBooleanFilter("onlyBestseller")}
-                  className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-amber-600 focus:ring-amber-500 dark:focus:ring-amber-400 dark:bg-gray-700"
                 />
                 <motion.label
                   htmlFor="only-bestseller"
-                  className="ml-2 text-sm text-gray-700"
+                  className="ml-2 text-sm text-gray-700 dark:text-gray-300"
                   animate={{ fontWeight: filters.onlyBestseller ? 600 : 400 }}
                 >
                   Bestsellers

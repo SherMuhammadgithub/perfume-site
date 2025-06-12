@@ -201,7 +201,7 @@ export default function CartDrawer() {
                               )}
                             </div>
                             <p className="text-sm font-medium text-gray-900">
-                              ${(item.price * item.quantity).toFixed(2)}
+                              Rs. {(item.price * item.quantity).toFixed(2)}
                             </p>
                           </div>
 
@@ -278,7 +278,7 @@ export default function CartDrawer() {
               </div>
               <div className="flex justify-between text-base font-medium text-gray-900 mb-4">
                 <p>Subtotal</p>
-                <p>${subtotal.toFixed(2)}</p>
+                <p>Rs. {subtotal.toFixed(2)}</p>
               </div>
               {cart.length > 0 && (
                 <div className="space-y-3">
