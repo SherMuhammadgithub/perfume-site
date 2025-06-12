@@ -109,7 +109,7 @@ export default function PrivacyPolicyPage() {
           If you have questions about this Privacy Policy, please contact us at:
         </p>
         <p>
-          Email: muhammadiqbalshermuhammad@gmail.com
+          Email: sentiluxe@outlook.com
           <br />
           Phone: +92 317 4396 952
           <br />
