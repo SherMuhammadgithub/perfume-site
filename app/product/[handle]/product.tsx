@@ -2,7 +2,14 @@
 
 import { useCart } from "app/context/cartContext";
 import { motion } from "framer-motion";
-import { Info, RotateCcw, ShoppingBag, Star, Truck } from "lucide-react";
+import {
+  AlertCircle,
+  Info,
+  RotateCcw,
+  ShoppingBag,
+  Star,
+  Truck,
+} from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 
 // Interface for PerfumeImage to match MongoDB schema
@@ -51,44 +58,77 @@ function ProductDescription({ product }: { product: Perfume }) {
   const [quantity, setQuantity] = useState(1);
   const [isWishListed, setIsWishListed] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [stockError, setStockError] = useState<string | null>(null);
 
-  // Cart functionality
-  const { addToCart } = useCart();
+  // Cart functionality with enhanced stock management
+  const { addToCart, cart, getRemainingStock, isItemAvailable } = useCart();
+
+  // Calculate available stock considering what's already in cart
+  const currentCartQuantity =
+    cart.find((item) => item._id === product._id)?.quantity || 0;
+  const availableStock = Math.max(0, product.stock - currentCartQuantity);
+  const isOutOfStock = availableStock <= 0;
 
   // Calculate discount percentage if discounted
   const discountPercentage = product.discountPrice
     ? Math.round((1 - product.discountPrice / product.price) * 100)
     : 0;
 
-  // Reset added-to-cart animation after 2 seconds
+  // Reset added-to-cart animation and error message after time
   useEffect(() => {
     if (addedToCart) {
       const timer = setTimeout(() => setAddedToCart(false), 2000);
       return () => clearTimeout(timer);
     }
-  }, [addedToCart]);
 
-  // Handle add to cart with animation
+    if (stockError) {
+      const timer = setTimeout(() => setStockError(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [addedToCart, stockError]);
+
+  // Handle add to cart with animation and stock checking
   const handleAddToCart = () => {
-    if (product.stock > 0) {
-      // Add to cart functionality
-      for (let i = 0; i < quantity; i++) {
-        addToCart(product);
-      }
+    if (isOutOfStock) {
+      setStockError("This item is out of stock");
+      return;
+    }
+
+    // Check if we can add the requested quantity
+    if (quantity > availableStock) {
+      setStockError(`Only ${availableStock} item(s) available`);
+      // Adjust quantity to available stock
+      setQuantity(availableStock);
+      return;
+    }
+
+    // Use the updated addToCart function that returns success status
+    const success = addToCart(product, quantity);
+
+    if (success) {
       setAddedToCart(true);
+    } else {
+      setStockError("Couldn't add to cart - stock limit reached");
     }
   };
 
-  // Handle quantity changes
+  // Handle quantity changes with stock awareness
   const incrementQuantity = () => {
-    if (quantity < Math.min(10, product.stock)) {
+    if (quantity < availableStock) {
       setQuantity(quantity + 1);
+    } else {
+      // Flash stock error message
+      setStockError(`Maximum available: ${availableStock}`);
     }
   };
 
   const decrementQuantity = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
+      // Clear error if we decrease below available stock
+      if (stockError && quantity <= availableStock) {
+        setStockError(null);
+      }
     }
   };
 
@@ -104,7 +144,7 @@ function ProductDescription({ product }: { product: Perfume }) {
           )}
         </div>
 
-        <h1 className="mt-2 text-2xl sm:text-3xl  font-bold text-gray-900 tracking-tight">
+        <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
           {product.name}
         </h1>
 
@@ -183,30 +223,32 @@ function ProductDescription({ product }: { product: Perfume }) {
           <span className="text-sm text-gray-500">No reviews yet</span>
         )}
 
-        {/* Enhanced Stock status with icon */}
+        {/* Enhanced Stock status with icon and cart awareness */}
         <div className="text-sm flex items-center">
-          {product.stock > 10 ? (
+          {isOutOfStock ? (
+            <span className="flex items-center gap-1 text-red-600 font-medium">
+              <span className="relative flex h-2 w-2">
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+              </span>
+              {currentCartQuantity > 0 ? "Max in Cart" : "Out of Stock"}
+            </span>
+          ) : availableStock <= 5 ? (
+            <span className="flex items-center gap-1 text-amber-600 font-medium">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+              </span>
+              Only {availableStock} available
+              {currentCartQuantity > 0 && ` (${currentCartQuantity} in cart)`}
+            </span>
+          ) : (
             <span className="flex items-center gap-1 text-green-600 font-medium">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </span>
               In Stock
-            </span>
-          ) : product.stock > 0 ? (
-            <span className="flex items-center gap-1 text-amber-600 font-medium">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-              </span>
-              Only {product.stock} left
-            </span>
-          ) : (
-            <span className="flex items-center gap-1 text-red-600 font-medium">
-              <span className="relative flex h-2 w-2">
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-              </span>
-              Out of Stock
+              {currentCartQuantity > 0 && ` (${currentCartQuantity} in cart)`}
             </span>
           )}
         </div>
@@ -249,8 +291,21 @@ function ProductDescription({ product }: { product: Perfume }) {
         </div>
       </div>
 
+      {/* Stock Error Message */}
+      {stockError && (
+        <motion.div
+          className="flex items-center p-3 rounded-md bg-red-50 border border-red-100 text-red-600"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+        >
+          <AlertCircle size={16} className="mr-2" />
+          <span className="text-sm">{stockError}</span>
+        </motion.div>
+      )}
+
       {/* Quantity control and Add to Cart - Enhanced with better design */}
-      {product.stock > 0 && (
+      {!isOutOfStock && (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
             <label className="text-sm font-medium text-gray-700 uppercase tracking-wider">
@@ -260,7 +315,13 @@ function ProductDescription({ product }: { product: Perfume }) {
             <div className="flex items-center h-12 rounded-md border border-gray-300 w-36">
               <button
                 onClick={decrementQuantity}
-                className="flex-1 flex justify-center items-center h-full text-gray-600 hover:text-gray-800 transition-colors"
+                className={`flex-1 flex justify-center items-center h-full 
+                  ${
+                    quantity <= 1
+                      ? "text-gray-300 cursor-not-allowed"
+                      : "text-gray-600 hover:text-gray-800"
+                  } 
+                  transition-colors`}
                 disabled={quantity <= 1}
               >
                 <span className="text-xl font-medium">−</span>
@@ -272,8 +333,19 @@ function ProductDescription({ product }: { product: Perfume }) {
 
               <button
                 onClick={incrementQuantity}
-                className="flex-1 flex justify-center items-center h-full text-gray-600 hover:text-gray-800 transition-colors"
-                disabled={quantity >= Math.min(10, product.stock)}
+                className={`flex-1 flex justify-center items-center h-full 
+                  ${
+                    quantity >= availableStock
+                      ? "text-gray-300 cursor-not-allowed"
+                      : "text-gray-600 hover:text-gray-800"
+                  } 
+                  transition-colors`}
+                disabled={quantity >= availableStock}
+                title={
+                  quantity >= availableStock
+                    ? `Maximum available: ${availableStock}`
+                    : ""
+                }
               >
                 <span className="text-xl font-medium">+</span>
               </button>
@@ -287,15 +359,24 @@ function ProductDescription({ product }: { product: Perfume }) {
                 ${
                   addedToCart
                     ? "bg-green-600 hover:bg-green-700"
-                    : "bg-black hover:bg-gray-800"
+                    : availableStock <= 0
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-black hover:bg-gray-800"
                 } 
                 transition-all duration-300`}
               onClick={handleAddToCart}
-              disabled={product.stock === 0}
+              disabled={availableStock <= 0}
             >
               {addedToCart ? (
                 <>
                   Added <span className="ml-1">✓</span>
+                </>
+              ) : availableStock <= 0 ? (
+                <>
+                  <Info size={18} />
+                  {currentCartQuantity > 0
+                    ? "Max Quantity in Cart"
+                    : "Out of Stock"}
                 </>
               ) : (
                 <>
@@ -309,13 +390,15 @@ function ProductDescription({ product }: { product: Perfume }) {
       )}
 
       {/* Out of Stock Button */}
-      {product.stock === 0 && (
+      {isOutOfStock && (
         <button
           className="w-full py-3.5 font-medium text-gray-500 bg-gray-200 rounded-md cursor-not-allowed flex items-center justify-center gap-2"
           disabled
         >
           <Info size={18} />
-          Out of Stock
+          {currentCartQuantity > 0
+            ? "Maximum Quantity in Cart"
+            : "Out of Stock"}
         </button>
       )}
 
