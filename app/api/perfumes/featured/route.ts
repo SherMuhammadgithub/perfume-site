@@ -15,7 +15,6 @@ export async function GET(req: NextRequest) {
     // Fetch featured perfumes and populate their collections
     const featuredPerfumes = await (Perfume as Model<any>)
       .find({ isFeatured: true })
-      .populate("collections") // Populate the collections field
       .sort({ createdAt: -1 })
       .limit(limit);
 
