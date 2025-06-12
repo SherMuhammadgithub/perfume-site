@@ -153,7 +153,7 @@ export function Navbar() {
 
       {/* Announcement Bar */}
       <div className="announcement-bar lowercase w-full text-white text-center py-2.5 text-xs tracking-widest font-light">
-        FREE SHIPPING ON ORDERS OVER $100 | 14 DAYS RETURN POLICY
+        FREE SHIPPING ON ORDERS OVER Rs. 5000 | 14 DAYS RETURN POLICY
       </div>
 
       {/* Main Navigation */}
