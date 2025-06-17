@@ -2,7 +2,7 @@
 import axios from "axios";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 // Define a type for our collection card
@@ -39,6 +39,7 @@ function CollectionCard({
 }: CollectionCardProps & { index: number }) {
   // Encode collection name for URL
   const encodedName = encodeURIComponent(name);
+  const router = useRouter();
 
   return (
     <motion.div
@@ -50,115 +51,114 @@ function CollectionCard({
         ease: [0.22, 1, 0.36, 1],
       }}
     >
-      <Link href={`/search?q=${encodedName}`}>
-        <motion.div
-          className="card relative overflow-hidden rounded-xl shadow-lg dark:shadow-gray-800/30 h-72 sm:h-80 md:h-96 cursor-pointer"
-          whileHover={{ y: -8 }}
-          transition={{ type: "spring", stiffness: 300, damping: 15 }}
-        >
-          {/* Image container */}
-          <div className="relative w-full h-full">
-            {image ? (
-              <motion.div className="w-full h-full">
-                <Image
-                  src={image}
-                  alt={name}
-                  fill
-                  className="object-cover object-center"
-                  sizes="(max-width: 640px) 90vw, (max-width: 768px) 40vw, 33vw"
-                  priority
-                />
-                <motion.div
-                  className="absolute inset-0 bg-black dark:bg-black/50"
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 0.2 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </motion.div>
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
-                <span className="text-gray-400 dark:text-gray-500 text-lg sm:text-2xl font-playfair italic">
-                  No Image
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Overlay with gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent dark:from-black/90 dark:via-black/50"></div>
-
-          {/* Content layer */}
-          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center z-10 p-6">
-            <motion.div
-              className="w-full"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <motion.h3
-                className="text-white text-center font-playfair text-xl sm:text-2xl font-medium mb-4"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                {name}
-              </motion.h3>
-
-              {description && (
-                <motion.p
-                  className="text-gray-200 text-sm text-center mb-4 line-clamp-2"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 0.8 }}
-                  transition={{ delay: 0.4 + index * 0.1, duration: 0.5 }}
-                  viewport={{ once: true }}
-                >
-                  {description}
-                </motion.p>
-              )}
-
+      <motion.div
+        onClick={() => router.push(`/search?q=${encodedName}`)}
+        className="card relative overflow-hidden rounded-xl shadow-lg dark:shadow-gray-800/30 h-72 sm:h-80 md:h-96 cursor-pointer"
+        whileHover={{ y: -8 }}
+        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+      >
+        {/* Image container */}
+        <div className="relative w-full h-full">
+          {image ? (
+            <motion.div className="w-full h-full">
+              <Image
+                src={image}
+                alt={name}
+                fill
+                className="object-cover object-center"
+                sizes="(max-width: 640px) 90vw, (max-width: 768px) 40vw, 33vw"
+                priority
+              />
               <motion.div
-                className="flex justify-center"
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
+                className="absolute inset-0 bg-black dark:bg-black/50"
+                initial={{ opacity: 0 }}
+                whileHover={{ opacity: 0.2 }}
+                transition={{ duration: 0.3 }}
+              />
+            </motion.div>
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+              <span className="text-gray-400 dark:text-gray-500 text-lg sm:text-2xl font-playfair italic">
+                No Image
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Overlay with gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent dark:from-black/90 dark:via-black/50"></div>
+
+        {/* Content layer */}
+        <div className="absolute inset-x-0 bottom-0 flex flex-col items-center z-10 p-6">
+          <motion.div
+            className="w-full"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <motion.h3
+              className="text-white text-center font-playfair text-xl sm:text-2xl font-medium mb-4"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              {name}
+            </motion.h3>
+
+            {description && (
+              <motion.p
+                className="text-gray-200 text-sm text-center mb-4 line-clamp-2"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 0.8 }}
+                transition={{ delay: 0.4 + index * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
               >
-                <motion.button
-                  className={`${
-                    isFeatured
-                      ? "bg-amber-500 hover:bg-amber-600"
-                      : "bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                  } ${isFeatured ? "text-white" : "text-black dark:text-white"} px-6 py-2.5 rounded-full text-xs uppercase tracking-widest font-medium shadow-md`}
-                  whileHover={{
-                    scale: 1.05,
-                    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
-                  }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                >
-                  {isFeatured ? "Featured Collection" : "Explore Collection"}
-                </motion.button>
-              </motion.div>
-            </motion.div>
-          </div>
+                {description}
+              </motion.p>
+            )}
 
-          {/* Special badge for featured collections */}
-          {isFeatured && (
             <motion.div
-              className="absolute top-4 right-4 bg-amber-500 text-white text-xs px-3 py-1 rounded-full tracking-wide shadow-md"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{
-                delay: 0.6 + index * 0.1,
-                type: "spring",
-                stiffness: 300,
-              }}
+              className="flex justify-center"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
+              viewport={{ once: true }}
             >
-              Featured
+              <motion.button
+                className={`${
+                  isFeatured
+                    ? "bg-amber-500 hover:bg-amber-600"
+                    : "bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+                } ${isFeatured ? "text-white" : "text-black dark:text-white"} px-6 py-2.5 rounded-full text-xs uppercase tracking-widest font-medium shadow-md`}
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
+                }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
+                {isFeatured ? "Featured Collection" : "Explore Collection"}
+              </motion.button>
             </motion.div>
-          )}
-        </motion.div>
-      </Link>
+          </motion.div>
+        </div>
+
+        {/* Special badge for featured collections */}
+        {isFeatured && (
+          <motion.div
+            className="absolute top-4 right-4 bg-amber-500 text-white text-xs px-3 py-1 rounded-full tracking-wide shadow-md"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+              delay: 0.6 + index * 0.1,
+              type: "spring",
+              stiffness: 300,
+            }}
+          >
+            Featured
+          </motion.div>
+        )}
+      </motion.div>
     </motion.div>
   );
 }
@@ -226,6 +226,7 @@ function SkeletonCard({ delay = 0 }) {
 export function ThreeItemGrid() {
   const [collections, setCollections] = useState<CollectionCardProps[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   async function fetchCollections() {
     try {
@@ -333,11 +334,11 @@ export function ThreeItemGrid() {
         transition={{ duration: 0.5, delay: 0.6 }}
         viewport={{ once: true }}
       >
-        <Link
-          href="/search"
+        <motion.div
+          onClick={() => router.push("/search")}
           className="relative inline-flex items-center gap-2 px-8 py-3 bg-black dark:bg-white dark:text-black text-white 
                         font-medium text-sm sm:text-base rounded-full transition-all duration-300 
-                        shadow-sm hover:shadow-md"
+                        shadow-sm hover:shadow-md cursor-pointer"
         >
           <span>Explore All Collections</span>
           <motion.span
@@ -352,7 +353,7 @@ export function ThreeItemGrid() {
           >
             →
           </motion.span>
-        </Link>
+        </motion.div>
       </motion.div>
     </motion.div>
   );

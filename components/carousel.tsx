@@ -11,7 +11,6 @@ import {
 import { Perfume } from "lib/interfaces/data.type";
 import { ChevronLeft, ChevronRight, ShoppingBag, Sparkles } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -562,12 +561,11 @@ export function FeaturedPerfumes() {
                 duration: 3,
               }}
             />
-            <Link
-              href="/search"
-              prefetch={true}
+            <motion.div
+              onClick={() => router.push("/search")}
               className="relative inline-flex items-center gap-2 px-8 py-3 bg-black dark:bg-white dark:text-black text-white 
                         font-medium text-sm sm:text-base rounded-full transition-all duration-300 
-                        shadow-sm hover:shadow-md"
+                        shadow-sm hover:shadow-md cursor-pointer"
             >
               <span>Explore All Perfumes</span>
               <motion.span
@@ -582,7 +580,7 @@ export function FeaturedPerfumes() {
               >
                 →
               </motion.span>
-            </Link>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>
